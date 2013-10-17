@@ -1,0 +1,109 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2013 Igor Konev
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+package com.github.jparse;
+
+import java.util.List;
+
+public final class Parsers {
+
+    private Parsers() {
+    }
+
+    public static <T> FluentParser<T, T> elem(T elem) {
+        return new ElemParser<T>(elem);
+    }
+
+    public static <T, U> FluentParser<T, U> success(U result) {
+        return new SuccessParser<T, U>(result);
+    }
+
+    public static <T, U> FluentParser<T, U> failure(String message) {
+        return new FailureParser<T, U>(message);
+    }
+
+    public static <T, U> FluentParser<T, U> error(String message) {
+        return new ErrorParser<T, U>(message);
+    }
+
+    public static <T, U, V> FluentParser<T, Pair<U, V>> then(Parser<T, U> parser1, Parser<T, V> parser2) {
+        return new ThenParser<T, U, V>(parser1, parser2);
+    }
+
+    public static <T, U> FluentParser<T, U> thenLeft(Parser<T, U> parser1, Parser<T, ?> parser2) {
+        return new ThenLeftParser<T, U>(parser1, parser2);
+    }
+
+    public static <T, U> FluentParser<T, U> thenRight(Parser<T, ?> parser1, Parser<T, U> parser2) {
+        return new ThenRightParser<T, U>(parser1, parser2);
+    }
+
+    public static <T, U> FluentParser<T, U> orelse(Parser<T, ? extends U> parser1, Parser<T, ? extends U> parser2) {
+        return new OrelseParser<T, U>(parser1, parser2);
+    }
+
+    public static <T, U> FluentParser<T, U> opt(Parser<T, U> parser) {
+        return new OptParser<T, U>(parser);
+    }
+
+    public static <T, U> FluentParser<T, List<U>> rep(Parser<T, U> parser) {
+        return new RepParser<T, U>(parser);
+    }
+
+    public static <T, U> FluentParser<T, List<U>> rep1(Parser<T, U> parser) {
+        return new Rep1Parser<T, U>(parser);
+    }
+
+    public static <T, U, V> FluentParser<T, V> map(Parser<T, U> parser, Function<? super U, ? extends V> function) {
+        return new MapParser<T, U, V>(parser, function);
+    }
+
+    public static <T, U> FluentParser<T, U> memo(Parser<T, U> parser) {
+        return new MemoParser<T, U>(parser);
+    }
+
+    public static <T, U> FluentParser<T, U> phrase(Parser<T, U> parser) {
+        return new PhraseParser<T, U>(parser);
+    }
+
+    public static <T, U> FluentParser<T, U> withFailureMessage(Parser<T, U> parser, String message) {
+        return new WithFailureMessageParser<T, U>(parser, message);
+    }
+
+    public static <T, U> FluentParser<T, U> withErrorMessage(Parser<T, U> parser, String message) {
+        return new WithErrorMessageParser<T, U>(parser, message);
+    }
+
+    public static <T, U> FluentParser<T, U> asFailure(Parser<T, U> parser) {
+        return new AsFailureParser<T, U>(parser);
+    }
+
+    public static <T, U> FluentParser<T, U> asError(Parser<T, U> parser) {
+        return new AsErrorParser<T, U>(parser);
+    }
+
+    public static <T, U> FluentParser<T, U> log(Parser<T, U> parser, String name) {
+        return new LogParser<T, U>(parser, name);
+    }
+}
