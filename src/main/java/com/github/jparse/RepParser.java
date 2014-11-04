@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.jparse.Objects.requireNonNull;
 import static com.github.jparse.ParseResult.success;
+import static java.util.Objects.requireNonNull;
 
 final class RepParser<T, U> extends FluentParser<T, List<U>> {
 
@@ -45,7 +45,7 @@ final class RepParser<T, U> extends FluentParser<T, List<U>> {
         if (!result.isSuccess()) {
             return success(Collections.<U>emptyList(), sequence);
         }
-        List<U> list = new ArrayList<U>();
+        List<U> list = new ArrayList<>();
         Sequence<T> rest;
         do {
             list.add(result.getResult());

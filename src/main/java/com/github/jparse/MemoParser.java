@@ -27,8 +27,8 @@ package com.github.jparse;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.jparse.Objects.requireNonNull;
 import static com.github.jparse.ParseResult.failure;
+import static java.util.Objects.requireNonNull;
 
 final class MemoParser<T, U> extends FluentParser<T, U> {
 
@@ -46,15 +46,15 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
     public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
         Map<Sequence<T>, SequenceEntry<T, U>> sequenceEntries = context.get(KEY);
         if (sequenceEntries == null) {
-            sequenceEntries = new HashMap<Sequence<T>, SequenceEntry<T, U>>();
+            sequenceEntries = new HashMap<>();
             context.put(KEY, sequenceEntries);
-            SequenceEntry<T, U> sequenceEntry = new SequenceEntry<T, U>();
+            SequenceEntry<T, U> sequenceEntry = new SequenceEntry<>();
             sequenceEntries.put(sequence, sequenceEntry);
             return setup(sequence, context, sequenceEntry);
         }
         SequenceEntry<T, U> sequenceEntry = sequenceEntries.get(requireNonNull(sequence));
         if (sequenceEntry == null) {
-            sequenceEntry = new SequenceEntry<T, U>();
+            sequenceEntry = new SequenceEntry<>();
             sequenceEntries.put(sequence, sequenceEntry);
             return setup(sequence, context, sequenceEntry);
         }
@@ -66,9 +66,9 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
     }
 
     private ParseResult<T, U> setup(Sequence<T> sequence, ParseContext context, SequenceEntry<T, U> sequenceEntry) {
-        ParserEntry<T, U> parserEntry = new ParserEntry<T, U>();
+        ParserEntry<T, U> parserEntry = new ParserEntry<>();
         sequenceEntry.parserEntries.put(parser, parserEntry);
-        sequenceEntry.stack = new StackEntry<T, U>(parserEntry, sequenceEntry.stack);
+        sequenceEntry.stack = new StackEntry<>(parserEntry, sequenceEntry.stack);
         ParseResult<T, ? extends U> result = parser.parse(sequence, context);
         sequenceEntry.stack = sequenceEntry.stack.next;
         if (parserEntry.state == SKIP) {
@@ -110,21 +110,20 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
 
     private static final class SequenceEntry<T, U> {
 
-        private final Map<Parser<T, ? extends U>, ParserEntry<T, U>> parserEntries =
-                new HashMap<Parser<T, ? extends U>, ParserEntry<T, U>>();
-        private StackEntry<T, U> stack;
+        final Map<Parser<T, ? extends U>, ParserEntry<T, U>> parserEntries = new HashMap<>();
+        StackEntry<T, U> stack;
     }
 
     private static final class ParserEntry<T, U> {
 
-        private ParseResult<T, U> result;
-        private int state;
+        ParseResult<T, U> result;
+        int state;
     }
 
     private static final class StackEntry<T, U> {
 
-        private final ParserEntry<T, U> parserEntry;
-        private final StackEntry<T, U> next;
+        final ParserEntry<T, U> parserEntry;
+        final StackEntry<T, U> next;
 
         private StackEntry(ParserEntry<T, U> parserEntry, StackEntry<T, U> next) {
             this.parserEntry = parserEntry;

@@ -32,78 +32,78 @@ public final class Parsers {
     }
 
     public static <T> FluentParser<T, T> elem(T elem) {
-        return new ElemParser<T>(elem);
+        return new ElemParser<>(elem);
     }
 
     public static <T, U> FluentParser<T, U> success(U result) {
-        return new SuccessParser<T, U>(result);
+        return new SuccessParser<>(result);
     }
 
     public static <T, U> FluentParser<T, U> failure(String message) {
-        return new FailureParser<T, U>(message);
+        return new FailureParser<>(message);
     }
 
     public static <T, U> FluentParser<T, U> error(String message) {
-        return new ErrorParser<T, U>(message);
+        return new ErrorParser<>(message);
     }
 
     public static <T, U, V> FluentParser<T, Pair<U, V>> then(Parser<T, U> parser1, Parser<T, V> parser2) {
-        return new ThenParser<T, U, V>(parser1, parser2);
+        return new ThenParser<>(parser1, parser2);
     }
 
     public static <T, U> FluentParser<T, U> thenLeft(Parser<T, U> parser1, Parser<T, ?> parser2) {
-        return new ThenLeftParser<T, U>(parser1, parser2);
+        return new ThenLeftParser<>(parser1, parser2);
     }
 
     public static <T, U> FluentParser<T, U> thenRight(Parser<T, ?> parser1, Parser<T, U> parser2) {
-        return new ThenRightParser<T, U>(parser1, parser2);
+        return new ThenRightParser<>(parser1, parser2);
     }
 
     public static <T, U> FluentParser<T, U> orelse(Parser<T, ? extends U> parser1, Parser<T, ? extends U> parser2) {
-        return new OrelseParser<T, U>(parser1, parser2);
+        return new OrelseParser<>(parser1, parser2);
     }
 
     public static <T, U> FluentParser<T, U> opt(Parser<T, U> parser) {
-        return new OptParser<T, U>(parser);
+        return new OptParser<>(parser);
     }
 
     public static <T, U> FluentParser<T, List<U>> rep(Parser<T, U> parser) {
-        return new RepParser<T, U>(parser);
+        return new RepParser<>(parser);
     }
 
     public static <T, U> FluentParser<T, List<U>> rep1(Parser<T, U> parser) {
-        return new Rep1Parser<T, U>(parser);
+        return new Rep1Parser<>(parser);
     }
 
     public static <T, U, V> FluentParser<T, V> map(Parser<T, U> parser, Function<? super U, ? extends V> function) {
-        return new MapParser<T, U, V>(parser, function);
+        return new MapParser<>(parser, function);
     }
 
     public static <T, U> FluentParser<T, U> memo(Parser<T, U> parser) {
-        return new MemoParser<T, U>(parser);
+        return new MemoParser<>(parser);
     }
 
     public static <T, U> FluentParser<T, U> phrase(Parser<T, U> parser) {
-        return new PhraseParser<T, U>(parser);
+        return new PhraseParser<>(parser);
     }
 
     public static <T, U> FluentParser<T, U> withFailureMessage(Parser<T, U> parser, String message) {
-        return new WithFailureMessageParser<T, U>(parser, message);
+        return new WithFailureMessageParser<>(parser, message);
     }
 
     public static <T, U> FluentParser<T, U> withErrorMessage(Parser<T, U> parser, String message) {
-        return new WithErrorMessageParser<T, U>(parser, message);
+        return new WithErrorMessageParser<>(parser, message);
     }
 
     public static <T, U> FluentParser<T, U> asFailure(Parser<T, U> parser) {
-        return new AsFailureParser<T, U>(parser);
+        return new AsFailureParser<>(parser);
     }
 
     public static <T, U> FluentParser<T, U> asError(Parser<T, U> parser) {
-        return new AsErrorParser<T, U>(parser);
+        return new AsErrorParser<>(parser);
     }
 
     public static <T, U> FluentParser<T, U> log(Parser<T, U> parser, String name) {
-        return new LogParser<T, U>(parser, name);
+        return new LogParser<>(parser, name);
     }
 }

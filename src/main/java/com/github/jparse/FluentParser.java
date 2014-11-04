@@ -26,7 +26,7 @@ package com.github.jparse;
 
 import java.util.List;
 
-import static com.github.jparse.Objects.requireNonNull;
+import static java.util.Objects.requireNonNull;
 
 public abstract class FluentParser<T, U> implements Parser<T, U> {
 
@@ -45,7 +45,6 @@ public abstract class FluentParser<T, U> implements Parser<T, U> {
             return (FluentParser<T, U>) parser;
         } else {
             return new FluentParser<T, U>(parser) {
-
                 @Override
                 public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
                     return parser.parse(sequence, context);

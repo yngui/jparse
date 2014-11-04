@@ -24,8 +24,8 @@
 
 package com.github.jparse;
 
-import static com.github.jparse.Objects.requireNonNull;
 import static com.github.jparse.ParseResult.success;
+import static java.util.Objects.requireNonNull;
 
 final class OptParser<T, U> extends FluentParser<T, U> {
 

@@ -29,7 +29,7 @@ import java.util.Map;
 
 public final class ParseContext {
 
-    private final Map<Object, Object> map = new IdentityHashMap<Object, Object>();
+    private final Map<Object, Object> map = new IdentityHashMap<>();
 
     @SuppressWarnings("unchecked")
     public <T> T get(Object key) {

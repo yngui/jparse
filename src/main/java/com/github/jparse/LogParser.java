@@ -27,7 +27,7 @@ package com.github.jparse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.github.jparse.Objects.requireNonNull;
+import static java.util.Objects.requireNonNull;
 
 final class LogParser<T, U> extends FluentParser<T, U> {
 
@@ -68,6 +68,6 @@ final class LogParser<T, U> extends FluentParser<T, U> {
 
     private static final class Indent {
 
-        private int value;
+        int value;
     }
 }

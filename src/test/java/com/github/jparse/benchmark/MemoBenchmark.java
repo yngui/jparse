@@ -49,16 +49,14 @@ public class MemoBenchmark extends AbstractBenchmark {
         FluentParser<Character, String> one = literal("1");
 
         FluentParser<Character, Object> rrOrigRef = new FluentParser<Character, Object>() {
-
             @Override
             public ParseResult<Character, Object> parse(Sequence<Character> sequence, ParseContext context) {
                 return RR_ORIG.parse(sequence, context);
             }
         };
-        RR_ORIG = new MemoParser<Character, Object>(one.then(rrOrigRef).orelse(one));
+        RR_ORIG = new MemoParser<>(one.then(rrOrigRef).orelse(one));
 
         FluentParser<Character, Object> rrModRef = new FluentParser<Character, Object>() {
-
             @Override
             public ParseResult<Character, Object> parse(Sequence<Character> sequence, ParseContext context) {
                 return RR_MOD.parse(sequence, context);
@@ -67,7 +65,6 @@ public class MemoBenchmark extends AbstractBenchmark {
         RR_MOD = one.then(rrModRef).orelse(one).memo();
 
         FluentParser<Character, Object> lrModRef = new FluentParser<Character, Object>() {
-
             @Override
             public ParseResult<Character, Object> parse(Sequence<Character> sequence, ParseContext context) {
                 return LR_MOD.parse(sequence, context);
@@ -111,10 +108,10 @@ public class MemoBenchmark extends AbstractBenchmark {
         public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
             Map<Key<T, U>, ParseResult<T, U>> results = context.get(KEY);
             if (results == null) {
-                results = new HashMap<Key<T, U>, ParseResult<T, U>>();
+                results = new HashMap<>();
                 context.put(KEY, results);
             }
-            Key<T, U> key = new Key<T, U>(parser, sequence);
+            Key<T, U> key = new Key<>(parser, sequence);
             ParseResult<T, U> result = results.get(key);
             if (result == null) {
                 result = parser.parse(sequence, context);

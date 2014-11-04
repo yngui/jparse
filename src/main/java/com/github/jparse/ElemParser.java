@@ -24,9 +24,9 @@
 
 package com.github.jparse;
 
-import static com.github.jparse.Objects.requireNonNull;
 import static com.github.jparse.ParseResult.failure;
 import static com.github.jparse.ParseResult.success;
+import static java.util.Objects.requireNonNull;
 
 final class ElemParser<T> extends FluentParser<T, T> {
 

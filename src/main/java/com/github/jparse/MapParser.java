@@ -24,7 +24,7 @@
 
 package com.github.jparse;
 
-import static com.github.jparse.Objects.requireNonNull;
+import static java.util.Objects.requireNonNull;
 
 final class MapParser<T, U, V> extends FluentParser<T, V> {
 

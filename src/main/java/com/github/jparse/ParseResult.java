@@ -24,7 +24,7 @@
 
 package com.github.jparse;
 
-import static com.github.jparse.Objects.requireNonNull;
+import static java.util.Objects.requireNonNull;
 
 public abstract class ParseResult<T, U> {
 
@@ -35,15 +35,15 @@ public abstract class ParseResult<T, U> {
     }
 
     public static <T, U> ParseResult<T, U> success(U result, Sequence<T> rest) {
-        return new Success<T, U>(result, rest);
+        return new Success<>(result, rest);
     }
 
     public static <T, U> ParseResult<T, U> failure(String message, Sequence<T> rest) {
-        return new Failure<T, U>(message, rest);
+        return new Failure<>(message, rest);
     }
 
     public static <T, U> ParseResult<T, U> error(String message, Sequence<T> rest) {
-        return new Error<T, U>(message, rest);
+        return new Error<>(message, rest);
     }
 
     @SuppressWarnings("unchecked")
@@ -111,7 +111,7 @@ public abstract class ParseResult<T, U> {
 
         @Override
         public <V> ParseResult<T, V> map(Function<? super U, ? extends V> function) {
-            return new Success<T, V>(function.apply(result), rest);
+            return new Success<>(function.apply(result), rest);
         }
 
         @Override
@@ -210,7 +210,7 @@ public abstract class ParseResult<T, U> {
 
         @Override
         public ParseResult<T, U> withFailureMessage(String message) {
-            return new Failure<T, U>(message, rest);
+            return new Failure<>(message, rest);
         }
 
         @Override
@@ -225,7 +225,7 @@ public abstract class ParseResult<T, U> {
 
         @Override
         public ParseResult<T, U> asError() {
-            return new Error<T, U>(message, rest);
+            return new Error<>(message, rest);
         }
 
         @Override
@@ -278,12 +278,12 @@ public abstract class ParseResult<T, U> {
 
         @Override
         public ParseResult<T, U> withErrorMessage(String message) {
-            return new Error<T, U>(message, rest);
+            return new Error<>(message, rest);
         }
 
         @Override
         public ParseResult<T, U> asFailure() {
-            return new Failure<T, U>(message, rest);
+            return new Failure<>(message, rest);
         }
 
         @Override
