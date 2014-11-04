@@ -31,21 +31,21 @@ import static com.github.jparse.ParseResult.failure;
 import static com.github.jparse.ParseResult.success;
 import static java.util.Objects.requireNonNull;
 
-final class PatternParser extends CharParser<String> {
+public final class PatternParser extends CharParser<String> {
 
     private final Pattern pattern;
 
-    PatternParser(Pattern pattern) {
+    public PatternParser(Pattern pattern) {
         this.pattern = requireNonNull(pattern);
     }
 
-    PatternParser(Pattern pattern, Pattern whitespacePattern) {
+    public PatternParser(Pattern pattern, Pattern whitespacePattern) {
         super(whitespacePattern);
         this.pattern = requireNonNull(pattern);
     }
 
     @Override
-    public ParseResult<Character, String> parse(Sequence<Character> sequence, ParseContext context) {
+    public ParseResult<Character, String> parse(Sequence<Character> sequence) {
         CharSequence charSequence = CharSequences.forSequence(sequence);
         int start = handleWhitespace(charSequence);
         Matcher matcher = pattern.matcher(charSequence.subSequence(start, charSequence.length()));

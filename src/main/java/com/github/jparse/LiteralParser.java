@@ -30,21 +30,21 @@ import static com.github.jparse.ParseResult.failure;
 import static com.github.jparse.ParseResult.success;
 import static java.util.Objects.requireNonNull;
 
-final class LiteralParser extends CharParser<String> {
+public final class LiteralParser extends CharParser<String> {
 
     private final String literal;
 
-    LiteralParser(String literal) {
+    public LiteralParser(String literal) {
         this.literal = requireNonNull(literal);
     }
 
-    LiteralParser(String literal, Pattern whitespacePattern) {
+    public LiteralParser(String literal, Pattern whitespacePattern) {
         super(whitespacePattern);
         this.literal = requireNonNull(literal);
     }
 
     @Override
-    public ParseResult<Character, String> parse(Sequence<Character> sequence, ParseContext context) {
+    public ParseResult<Character, String> parse(Sequence<Character> sequence) {
         CharSequence charSequence = CharSequences.forSequence(sequence);
         int start = handleWhitespace(charSequence);
         int end = start + literal.length();

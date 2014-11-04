@@ -26,18 +26,18 @@ package com.github.jparse;
 
 import static java.util.Objects.requireNonNull;
 
-final class MapParser<T, U, V> extends FluentParser<T, V> {
+public final class MapParser<T, U, V> extends FluentParser<T, V> {
 
     private final Parser<T, ? extends U> parser;
     private final Function<? super U, ? extends V> function;
 
-    MapParser(Parser<T, ? extends U> parser, Function<? super U, ? extends V> function) {
+    public MapParser(Parser<T, ? extends U> parser, Function<? super U, ? extends V> function) {
         this.parser = requireNonNull(parser);
         this.function = requireNonNull(function);
     }
 
     @Override
-    public ParseResult<T, V> parse(Sequence<T> sequence, ParseContext context) {
-        return parser.parse(sequence, context).map(function);
+    public ParseResult<T, V> parse(Sequence<T> sequence) {
+        return parser.parse(sequence).map(function);
     }
 }

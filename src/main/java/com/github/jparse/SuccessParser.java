@@ -26,16 +26,16 @@ package com.github.jparse;
 
 import static com.github.jparse.ParseResult.success;
 
-final class SuccessParser<T, U> extends FluentParser<T, U> {
+public final class SuccessParser<T, U> extends FluentParser<T, U> {
 
     private final U result;
 
-    SuccessParser(U result) {
+    public SuccessParser(U result) {
         this.result = result;
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
+    public ParseResult<T, U> parse(Sequence<T> sequence) {
         return success(result, sequence);
     }
 }

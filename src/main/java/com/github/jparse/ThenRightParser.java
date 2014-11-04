@@ -26,22 +26,22 @@ package com.github.jparse;
 
 import static java.util.Objects.requireNonNull;
 
-final class ThenRightParser<T, U> extends FluentParser<T, U> {
+public final class ThenRightParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ?> parser1;
     private final Parser<T, ? extends U> parser2;
 
-    ThenRightParser(Parser<T, ?> parser1, Parser<T, ? extends U> parser2) {
+    public ThenRightParser(Parser<T, ?> parser1, Parser<T, ? extends U> parser2) {
         this.parser1 = requireNonNull(parser1);
         this.parser2 = requireNonNull(parser2);
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
-        ParseResult<T, ?> result1 = parser1.parse(sequence, context);
+    public ParseResult<T, U> parse(Sequence<T> sequence) {
+        ParseResult<T, ?> result1 = parser1.parse(sequence);
         if (!result1.isSuccess()) {
             return result1.cast();
         }
-        return parser2.parse(result1.getRest(), context).cast();
+        return parser2.parse(result1.getRest()).cast();
     }
 }

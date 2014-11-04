@@ -28,16 +28,16 @@ import static com.github.jparse.ParseResult.failure;
 import static com.github.jparse.ParseResult.success;
 import static java.util.Objects.requireNonNull;
 
-final class ElemParser<T> extends FluentParser<T, T> {
+public final class ElemParser<T> extends FluentParser<T, T> {
 
     private final T elem;
 
-    ElemParser(T elem) {
+    public ElemParser(T elem) {
         this.elem = requireNonNull(elem);
     }
 
     @Override
-    public ParseResult<T, T> parse(Sequence<T> sequence, ParseContext context) {
+    public ParseResult<T, T> parse(Sequence<T> sequence) {
         if (sequence.length() == 0 || !sequence.at(0).equals(elem)) {
             return failure('\'' + elem.toString() + "' expected", sequence);
         }

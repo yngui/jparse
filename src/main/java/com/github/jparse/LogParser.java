@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
-final class LogParser<T, U> extends FluentParser<T, U> {
+public final class LogParser<T, U> extends FluentParser<T, U> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogParser.class);
     private static final Object KEY = new Object();
@@ -37,37 +37,46 @@ final class LogParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ? extends U> parser;
     private final String name;
+    private final Context context;
 
-    LogParser(Parser<T, ? extends U> parser, String name) {
+    public LogParser(Parser<T, ? extends U> parser, String name) {
+        this(parser, name, new Context());
+    }
+
+    public LogParser(Parser<T, ? extends U> parser, String name, Context context) {
         this.parser = requireNonNull(parser);
         this.name = requireNonNull(name);
+        this.context = requireNonNull(context);
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
+    public ParseResult<T, U> parse(Sequence<T> sequence) {
         if (!LOGGER.isDebugEnabled()) {
-            return parser.parse(sequence, context).cast();
+            return parser.parse(sequence).cast();
         }
-        Indent indent = context.get(KEY);
-        if (indent == null) {
-            indent = new Indent();
-            context.put(KEY, indent);
-        }
-        int value = indent.value;
-        StringBuilder sb = new StringBuilder(value);
-        for (int i = 0; i < value; i++) {
+        int ident = context.ident;
+        StringBuilder sb = new StringBuilder(ident);
+        for (int i = 0; i < ident; i++) {
             sb.append(INDENT);
         }
         LOGGER.debug("{}{} <-- {}", sb, name, sequence);
-        indent.value++;
-        ParseResult<T, U> result = parser.parse(sequence, context).cast();
-        indent.value--;
+        context.ident = ident + 1;
+        ParseResult<T, U> result = parser.parse(sequence).cast();
+        context.ident--;
         LOGGER.debug("{}{} --> {}", sb, name, result);
         return result;
     }
 
-    private static final class Indent {
+    public static final class Context {
 
-        int value;
+        int ident;
+
+        public void reset() {
+            ident = 0;
+        }
     }
 }

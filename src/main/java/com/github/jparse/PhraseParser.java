@@ -27,17 +27,17 @@ package com.github.jparse;
 import static com.github.jparse.ParseResult.failure;
 import static java.util.Objects.requireNonNull;
 
-final class PhraseParser<T, U> extends FluentParser<T, U> {
+public final class PhraseParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ? extends U> parser;
 
-    PhraseParser(Parser<T, ? extends U> parser) {
+    public PhraseParser(Parser<T, ? extends U> parser) {
         this.parser = requireNonNull(parser);
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
-        ParseResult<T, ? extends U> result = parser.parse(sequence, context);
+    public ParseResult<T, U> parse(Sequence<T> sequence) {
+        ParseResult<T, ? extends U> result = parser.parse(sequence);
         if (result.isSuccess() && result.getRest().length() > 0) {
             return failure("end of sequence expected", result.getRest());
         }

@@ -31,17 +31,17 @@ import java.util.List;
 import static com.github.jparse.ParseResult.success;
 import static java.util.Objects.requireNonNull;
 
-final class Rep1Parser<T, U> extends FluentParser<T, List<U>> {
+public final class Rep1Parser<T, U> extends FluentParser<T, List<U>> {
 
     private final Parser<T, ? extends U> parser;
 
-    Rep1Parser(Parser<T, ? extends U> parser) {
+    public Rep1Parser(Parser<T, ? extends U> parser) {
         this.parser = requireNonNull(parser);
     }
 
     @Override
-    public ParseResult<T, List<U>> parse(Sequence<T> sequence, ParseContext context) {
-        ParseResult<T, ? extends U> result = parser.parse(sequence, context);
+    public ParseResult<T, List<U>> parse(Sequence<T> sequence) {
+        ParseResult<T, ? extends U> result = parser.parse(sequence);
         if (!result.isSuccess()) {
             return result.cast();
         }
@@ -50,7 +50,7 @@ final class Rep1Parser<T, U> extends FluentParser<T, List<U>> {
         do {
             list.add(result.getResult());
             rest = result.getRest();
-            result = parser.parse(rest, context);
+            result = parser.parse(rest);
             if (result.isError()) {
                 return result.cast();
             }

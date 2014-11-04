@@ -30,46 +30,48 @@ import java.util.Map;
 import static com.github.jparse.ParseResult.failure;
 import static java.util.Objects.requireNonNull;
 
-final class MemoParser<T, U> extends FluentParser<T, U> {
+public final class MemoParser<T, U> extends FluentParser<T, U> {
 
-    private static final Object KEY = new Object();
     private static final int DETECTED = 1;
     private static final int SKIP = 2;
 
     private final Parser<T, ? extends U> parser;
+    private final Context<T> context;
 
-    MemoParser(Parser<T, ? extends U> parser) {
+    public MemoParser(Parser<T, ? extends U> parser) {
+        this(parser, new Context<T>());
+    }
+
+    public MemoParser(Parser<T, ? extends U> parser, Context<T> context) {
         this.parser = requireNonNull(parser);
+        this.context = requireNonNull(context);
+    }
+
+    public Context<T> getContext() {
+        return context;
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
-        Map<Sequence<T>, SequenceEntry<T, U>> sequenceEntries = context.get(KEY);
-        if (sequenceEntries == null) {
-            sequenceEntries = new HashMap<>();
-            context.put(KEY, sequenceEntries);
-            SequenceEntry<T, U> sequenceEntry = new SequenceEntry<>();
-            sequenceEntries.put(sequence, sequenceEntry);
-            return setup(sequence, context, sequenceEntry);
-        }
-        SequenceEntry<T, U> sequenceEntry = sequenceEntries.get(requireNonNull(sequence));
+    public ParseResult<T, U> parse(Sequence<T> sequence) {
+        Map<Sequence<T>, SequenceEntry<T>> sequenceEntries = context.sequenceEntries;
+        SequenceEntry<T> sequenceEntry = sequenceEntries.get(requireNonNull(sequence));
         if (sequenceEntry == null) {
             sequenceEntry = new SequenceEntry<>();
             sequenceEntries.put(sequence, sequenceEntry);
-            return setup(sequence, context, sequenceEntry);
+            return setup(sequence, sequenceEntry);
         }
-        ParserEntry<T, U> parserEntry = sequenceEntry.parserEntries.get(parser);
+        ParserEntry<T> parserEntry = sequenceEntry.parserEntries.get(parser);
         if (parserEntry == null) {
-            return setup(sequence, context, sequenceEntry);
+            return setup(sequence, sequenceEntry);
         }
-        return recall(sequence, context, sequenceEntry, parserEntry);
+        return recall(sequence, sequenceEntry, parserEntry);
     }
 
-    private ParseResult<T, U> setup(Sequence<T> sequence, ParseContext context, SequenceEntry<T, U> sequenceEntry) {
-        ParserEntry<T, U> parserEntry = new ParserEntry<>();
+    private ParseResult<T, U> setup(Sequence<T> sequence, SequenceEntry<T> sequenceEntry) {
+        ParserEntry<T> parserEntry = new ParserEntry<>();
         sequenceEntry.parserEntries.put(parser, parserEntry);
         sequenceEntry.stack = new StackEntry<>(parserEntry, sequenceEntry.stack);
-        ParseResult<T, ? extends U> result = parser.parse(sequence, context);
+        ParseResult<T, ? extends U> result = parser.parse(sequence);
         sequenceEntry.stack = sequenceEntry.stack.next;
         if (parserEntry.state == SKIP) {
             return result.cast();
@@ -80,26 +82,25 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
         }
         while (true) {
             parserEntry.result = result.cast();
-            result = parser.parse(sequence, context);
+            result = parser.parse(sequence);
             if (result.isError()) {
                 return result.cast();
             }
             if (result.isFailure() || result.getRest().length() >= parserEntry.result.getRest().length()) {
-                return parserEntry.result;
+                return parserEntry.result.cast();
             }
         }
     }
 
-    private ParseResult<T, U> recall(Sequence<T> sequence, ParseContext context, SequenceEntry<T, U> sequenceEntry,
-            ParserEntry<T, U> parserEntry) {
+    private ParseResult<T, U> recall(Sequence<T> sequence, SequenceEntry<T> sequenceEntry, ParserEntry<T> parserEntry) {
         if (parserEntry.state == SKIP) {
-            return parser.parse(sequence, context).cast();
+            return parser.parse(sequence).cast();
         }
-        ParseResult<T, U> result = parserEntry.result;
+        ParseResult<T, ?> result = parserEntry.result;
         if (result != null) {
-            return result;
+            return result.cast();
         }
-        StackEntry<T, U> stack = sequenceEntry.stack;
+        StackEntry<T> stack = sequenceEntry.stack;
         while (stack.parserEntry != parserEntry) {
             stack.parserEntry.state = SKIP;
             stack = stack.next;
@@ -108,24 +109,33 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
         return failure("infinite left recursion detected", sequence);
     }
 
-    private static final class SequenceEntry<T, U> {
+    public static final class Context<T> {
 
-        final Map<Parser<T, ? extends U>, ParserEntry<T, U>> parserEntries = new HashMap<>();
-        StackEntry<T, U> stack;
+        Map<Sequence<T>, SequenceEntry<T>> sequenceEntries = new HashMap<>();
+
+        public void reset() {
+            sequenceEntries.clear();
+        }
     }
 
-    private static final class ParserEntry<T, U> {
+    private static final class SequenceEntry<T> {
 
-        ParseResult<T, U> result;
+        final Map<Parser<T, ?>, ParserEntry<T>> parserEntries = new HashMap<>();
+        StackEntry<T> stack;
+    }
+
+    private static final class ParserEntry<T> {
+
+        ParseResult<T, ?> result;
         int state;
     }
 
-    private static final class StackEntry<T, U> {
+    private static final class StackEntry<T> {
 
-        final ParserEntry<T, U> parserEntry;
-        final StackEntry<T, U> next;
+        final ParserEntry<T> parserEntry;
+        final StackEntry<T> next;
 
-        private StackEntry(ParserEntry<T, U> parserEntry, StackEntry<T, U> next) {
+        private StackEntry(ParserEntry<T> parserEntry, StackEntry<T> next) {
             this.parserEntry = parserEntry;
             this.next = next;
         }

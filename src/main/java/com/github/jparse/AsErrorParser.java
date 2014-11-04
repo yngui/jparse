@@ -26,16 +26,16 @@ package com.github.jparse;
 
 import static java.util.Objects.requireNonNull;
 
-final class AsErrorParser<T, U> extends FluentParser<T, U> {
+public final class AsErrorParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ? extends U> parser;
 
-    AsErrorParser(Parser<T, ? extends U> parser) {
+    public AsErrorParser(Parser<T, ? extends U> parser) {
         this.parser = requireNonNull(parser);
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
-        return parser.parse(sequence, context).asError().cast();
+    public ParseResult<T, U> parse(Sequence<T> sequence) {
+        return parser.parse(sequence).asError().cast();
     }
 }

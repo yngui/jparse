@@ -26,16 +26,16 @@ package com.github.jparse;
 
 import static com.github.jparse.ParseResult.failure;
 
-final class FailureParser<T, U> extends FluentParser<T, U> {
+public final class FailureParser<T, U> extends FluentParser<T, U> {
 
     private final String message;
 
-    FailureParser(String message) {
+    public FailureParser(String message) {
         this.message = message;
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
+    public ParseResult<T, U> parse(Sequence<T> sequence) {
         return failure(message, sequence);
     }
 }

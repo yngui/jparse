@@ -26,11 +26,13 @@ package com.github.jparse.benchmark;
 
 import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
 import com.github.jparse.FluentParser;
-import com.github.jparse.ParseContext;
+import com.github.jparse.MemoParser;
+import com.github.jparse.Pair;
 import com.github.jparse.ParseResult;
 import com.github.jparse.Parser;
 import com.github.jparse.Sequence;
 import com.github.jparse.Sequences;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -40,116 +42,81 @@ import static com.github.jparse.CharParsers.literal;
 
 public class MemoBenchmark extends AbstractBenchmark {
 
-    private static final FluentParser<Character, Object> RR_ORIG;
-    private static final FluentParser<Character, Object> RR_MOD;
-    private static final FluentParser<Character, Object> LR_MOD;
-    private static final Sequence<Character> SEQUENCE;
+    private FluentParser<Character, Object> rrOrig;
+    private FluentParser<Character, Object> rrMod;
+    private FluentParser<Character, Object> lrMod;
+    private Sequence<Character> sequence;
 
-    static {
+    @Before
+    public void setUp() throws Exception {
         FluentParser<Character, String> one = literal("1");
 
         FluentParser<Character, Object> rrOrigRef = new FluentParser<Character, Object>() {
             @Override
-            public ParseResult<Character, Object> parse(Sequence<Character> sequence, ParseContext context) {
-                return RR_ORIG.parse(sequence, context);
+            public ParseResult<Character, Object> parse(Sequence<Character> sequence) {
+                return rrOrig.parse(sequence);
             }
         };
-        RR_ORIG = new MemoParser<>(one.then(rrOrigRef).orelse(one));
+        rrOrig = new RrOrigMemoParser<>(one.then(rrOrigRef).orelse(one),
+                new HashMap<Pair<Parser<Character, Object>, Sequence<Character>>, ParseResult<Character, Object>>());
 
         FluentParser<Character, Object> rrModRef = new FluentParser<Character, Object>() {
             @Override
-            public ParseResult<Character, Object> parse(Sequence<Character> sequence, ParseContext context) {
-                return RR_MOD.parse(sequence, context);
+            public ParseResult<Character, Object> parse(Sequence<Character> sequence) {
+                return rrMod.parse(sequence);
             }
         };
-        RR_MOD = one.then(rrModRef).orelse(one).memo();
+        rrMod = one.then(rrModRef).orelse(one).memo(new MemoParser.Context<Character>());
 
         FluentParser<Character, Object> lrModRef = new FluentParser<Character, Object>() {
             @Override
-            public ParseResult<Character, Object> parse(Sequence<Character> sequence, ParseContext context) {
-                return LR_MOD.parse(sequence, context);
+            public ParseResult<Character, Object> parse(Sequence<Character> sequence) {
+                return lrMod.parse(sequence);
             }
         };
-        LR_MOD = lrModRef.then(one).orelse(one).memo();
+        lrMod = lrModRef.then(one).orelse(one).memo(new MemoParser.Context<Character>());
 
         StringBuilder sb = new StringBuilder(10000);
         for (int i = 0; i < 10000; i++) {
             sb.append('1');
         }
-        SEQUENCE = Sequences.forCharSequence(sb.toString());
+        sequence = Sequences.forCharSequence(sb.toString());
     }
 
     @Test
     public void rrOrig() {
-        RR_ORIG.phrase().parse(SEQUENCE, new ParseContext());
+        rrOrig.phrase().parse(sequence);
     }
 
     @Test
     public void rrMod() {
-        RR_MOD.phrase().parse(SEQUENCE, new ParseContext());
+        rrMod.phrase().parse(sequence);
     }
 
     @Test
     public void lrMod() {
-        LR_MOD.phrase().parse(SEQUENCE, new ParseContext());
+        lrMod.phrase().parse(sequence);
     }
 
-    private static final class MemoParser<T, U> extends FluentParser<T, U> {
-
-        private static final Object KEY = new Object();
+    private static final class RrOrigMemoParser<T, U> extends FluentParser<T, U> {
 
         private final Parser<T, U> parser;
+        private final Map<Pair<Parser<T, U>, Sequence<T>>, ParseResult<T, U>> results;
 
-        private MemoParser(Parser<T, U> parser) {
+        RrOrigMemoParser(Parser<T, U> parser, Map<Pair<Parser<T, U>, Sequence<T>>, ParseResult<T, U>> results) {
             this.parser = parser;
+            this.results = results;
         }
 
         @Override
-        public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
-            Map<Key<T, U>, ParseResult<T, U>> results = context.get(KEY);
-            if (results == null) {
-                results = new HashMap<>();
-                context.put(KEY, results);
-            }
-            Key<T, U> key = new Key<>(parser, sequence);
+        public ParseResult<T, U> parse(Sequence<T> sequence) {
+            Pair<Parser<T, U>, Sequence<T>> key = Pair.create(parser, sequence);
             ParseResult<T, U> result = results.get(key);
             if (result == null) {
-                result = parser.parse(sequence, context);
+                result = parser.parse(sequence);
                 results.put(key, result);
             }
-            return result;
-        }
-
-        private static final class Key<T, V> {
-
-            private final Parser<T, V> parser;
-            private final Sequence<T> sequence;
-
-            private Key(Parser<T, V> parser, Sequence<T> sequence) {
-                this.parser = parser;
-                this.sequence = sequence;
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj == this) {
-                    return true;
-                }
-                if (!(obj instanceof Key)) {
-                    return false;
-                }
-                @SuppressWarnings("unchecked")
-                Key<T, V> other = (Key<T, V>) obj;
-                return parser.equals(other.parser) && sequence.equals(other.sequence);
-            }
-
-            @Override
-            public int hashCode() {
-                int result = 17;
-                result = 31 * result + parser.hashCode();
-                result = 31 * result + sequence.hashCode();
-                return result;
-            }
+            return result.cast();
         }
     }
 }

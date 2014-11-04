@@ -26,23 +26,23 @@ package com.github.jparse;
 
 import static java.util.Objects.requireNonNull;
 
-final class OrelseParser<T, U> extends FluentParser<T, U> {
+public final class OrelseParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ? extends U> parser1;
     private final Parser<T, ? extends U> parser2;
 
-    OrelseParser(Parser<T, ? extends U> parser1, Parser<T, ? extends U> parser2) {
+    public OrelseParser(Parser<T, ? extends U> parser1, Parser<T, ? extends U> parser2) {
         this.parser1 = requireNonNull(parser1);
         this.parser2 = requireNonNull(parser2);
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context) {
-        ParseResult<T, ? extends U> result1 = parser1.parse(sequence, context);
+    public ParseResult<T, U> parse(Sequence<T> sequence) {
+        ParseResult<T, ? extends U> result1 = parser1.parse(sequence);
         if (!result1.isFailure()) {
             return result1.cast();
         }
-        ParseResult<T, ? extends U> result2 = parser2.parse(sequence, context);
+        ParseResult<T, ? extends U> result2 = parser2.parse(sequence);
         if (!result2.isFailure()) {
             return result2.cast();
         }

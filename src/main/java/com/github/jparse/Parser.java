@@ -26,5 +26,5 @@ package com.github.jparse;
 
 public interface Parser<T, U> {
 
-    ParseResult<T, U> parse(Sequence<T> sequence, ParseContext context);
+    ParseResult<T, U> parse(Sequence<T> sequence);
 }

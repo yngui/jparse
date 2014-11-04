@@ -31,15 +31,15 @@ public final class CharParsers {
     private CharParsers() {
     }
 
-    public static FluentParser<Character, String> literal(String literal) {
+    public static LiteralParser literal(String literal) {
         return new LiteralParser(literal);
     }
 
-    public static FluentParser<Character, String> pattern(String pattern) {
+    public static PatternParser pattern(String pattern) {
         return new PatternParser(Pattern.compile(pattern));
     }
 
-    public static FluentParser<Character, String> pattern(Pattern pattern) {
+    public static PatternParser pattern(Pattern pattern) {
         return new PatternParser(pattern);
     }
 }
