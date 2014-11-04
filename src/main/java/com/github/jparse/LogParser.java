@@ -39,10 +39,6 @@ public final class LogParser<T, U> extends FluentParser<T, U> {
     private final String name;
     private final Context context;
 
-    public LogParser(Parser<T, ? extends U> parser, String name) {
-        this(parser, name, new Context());
-    }
-
     public LogParser(Parser<T, ? extends U> parser, String name, Context context) {
         this.parser = requireNonNull(parser);
         this.name = requireNonNull(name);

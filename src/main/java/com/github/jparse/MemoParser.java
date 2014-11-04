@@ -38,10 +38,6 @@ public final class MemoParser<T, U> extends FluentParser<T, U> {
     private final Parser<T, ? extends U> parser;
     private final Context<T> context;
 
-    public MemoParser(Parser<T, ? extends U> parser) {
-        this(parser, new Context<T>());
-    }
-
     public MemoParser(Parser<T, ? extends U> parser, Context<T> context) {
         this.parser = requireNonNull(parser);
         this.context = requireNonNull(context);

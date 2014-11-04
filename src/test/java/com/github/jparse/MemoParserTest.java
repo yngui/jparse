@@ -62,14 +62,15 @@ public class MemoParserTest {
 
     @Test
     public void test1() {
-        expr = new MemoParser<>(exprRef.then(plus).then(num).orelse(num));
+        expr = new MemoParser<>(exprRef.then(plus).then(num).orelse(num), new MemoParser.Context<Character>());
         ParseResult<Character, Object> result = expr.phrase().parse(sequence);
         assertEquals(RESULT, result.getResult());
     }
 
     @Test
     public void test2() {
-        expr = new MemoParser<>(exprRef.then(plus).then(num).orelse(exprRef.then(plus).then(num)).orelse(num));
+        expr = new MemoParser<>(exprRef.then(plus).then(num).orelse(exprRef.then(plus).then(num)).orelse(num),
+                new MemoParser.Context<Character>());
         ParseResult<Character, Object> result = expr.phrase().parse(sequence);
         assertEquals(RESULT, result.getResult());
     }
@@ -85,7 +86,7 @@ public class MemoParserTest {
 
     @Test
     public void test4() {
-        expr = new MemoParser<>(exprRef);
+        expr = new MemoParser<>(exprRef, new MemoParser.Context<Character>());
         ParseResult<Character, Object> result = expr.phrase().parse(Sequences.forCharSequence("dummy"));
         assertEquals("infinite left recursion detected", result.getMessage());
     }
