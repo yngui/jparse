@@ -29,24 +29,25 @@ import java.util.regex.Pattern;
 
 import static com.github.jparse.ParseResult.failure;
 import static com.github.jparse.ParseResult.success;
+import static com.github.jparse.Sequences.toCharSequence;
 import static java.util.Objects.requireNonNull;
 
-public final class PatternParser extends CharParser<String> {
+final class PatternParser extends CharParser<String> {
 
     private final Pattern pattern;
 
-    public PatternParser(Pattern pattern) {
+    PatternParser(Pattern pattern) {
         this.pattern = requireNonNull(pattern);
     }
 
-    public PatternParser(Pattern pattern, Pattern whitespacePattern) {
+    PatternParser(Pattern pattern, Pattern whitespacePattern) {
         super(whitespacePattern);
         this.pattern = requireNonNull(pattern);
     }
 
     @Override
     public ParseResult<Character, String> parse(Sequence<Character> sequence) {
-        CharSequence charSequence = CharSequences.forSequence(sequence);
+        CharSequence charSequence = toCharSequence(sequence);
         int start = handleWhitespace(charSequence);
         Matcher matcher = pattern.matcher(charSequence.subSequence(start, charSequence.length()));
         if (!matcher.lookingAt()) {

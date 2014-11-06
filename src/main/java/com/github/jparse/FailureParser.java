@@ -26,11 +26,11 @@ package com.github.jparse;
 
 import static com.github.jparse.ParseResult.failure;
 
-public final class FailureParser<T, U> extends FluentParser<T, U> {
+final class FailureParser<T, U> extends FluentParser<T, U> {
 
     private final String message;
 
-    public FailureParser(String message) {
+    FailureParser(String message) {
         this.message = message;
     }
 

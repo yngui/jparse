@@ -24,6 +24,8 @@
 
 package com.github.jparse;
 
+import java.util.List;
+
 import static java.util.Objects.requireNonNull;
 
 public abstract class FluentParser<T, U> implements Parser<T, U> {
@@ -56,63 +58,63 @@ public abstract class FluentParser<T, U> implements Parser<T, U> {
         return (FluentParser<T, V>) this;
     }
 
-    public final <V> ThenParser<T, U, V> then(Parser<T, V> parser) {
+    public final <V> FluentParser<T, Pair<U, V>> then(Parser<T, V> parser) {
         return Parsers.then(this.parser, parser);
     }
 
-    public final ThenLeftParser<T, U> thenLeft(Parser<T, ?> parser) {
+    public final FluentParser<T, U> thenLeft(Parser<T, ?> parser) {
         return Parsers.thenLeft(this.parser, parser);
     }
 
-    public final <V> ThenRightParser<T, V> thenRight(Parser<T, V> parser) {
+    public final <V> FluentParser<T, V> thenRight(Parser<T, V> parser) {
         return Parsers.thenRight(this.parser, parser);
     }
 
-    public final OrelseParser<T, Object> orelse(Parser<T, ?> parser) {
+    public final FluentParser<T, Object> orelse(Parser<T, ?> parser) {
         return Parsers.<T, Object>orelse(this.parser, parser);
     }
 
-    public final OptParser<T, U> opt() {
+    public final FluentParser<T, U> opt() {
         return Parsers.opt(parser);
     }
 
-    public final RepParser<T, U> rep() {
+    public final FluentParser<T, List<U>> rep() {
         return Parsers.rep(parser);
     }
 
-    public final Rep1Parser<T, U> rep1() {
+    public final FluentParser<T, List<U>> rep1() {
         return Parsers.rep1(parser);
     }
 
-    public final <V> MapParser<T, U, V> map(Function<? super U, ? extends V> function) {
+    public final <V> FluentParser<T, V> map(Function<? super U, ? extends V> function) {
         return Parsers.map(parser, function);
     }
 
-    public final MemoParser<T, U> memo(MemoParser.Context<T> context) {
-        return Parsers.memo(parser, context);
+    public final FluentParser<T, U> memo() {
+        return Parsers.memo(parser);
     }
 
-    public final PhraseParser<T, U> phrase() {
+    public final FluentParser<T, U> phrase() {
         return Parsers.phrase(parser);
     }
 
-    public final WithFailureMessageParser<T, U> withFailureMessage(String message) {
+    public final FluentParser<T, U> withFailureMessage(String message) {
         return Parsers.withFailureMessage(parser, message);
     }
 
-    public final WithErrorMessageParser<T, U> withErrorMessage(String message) {
+    public final FluentParser<T, U> withErrorMessage(String message) {
         return Parsers.withErrorMessage(parser, message);
     }
 
-    public final AsFailureParser<T, U> asFailure() {
+    public final FluentParser<T, U> asFailure() {
         return Parsers.asFailure(parser);
     }
 
-    public final AsErrorParser<T, U> asError() {
+    public final FluentParser<T, U> asError() {
         return Parsers.asError(parser);
     }
 
-    public final LogParser<T, U> log(String name, LogParser.Context context) {
-        return Parsers.log(parser, name, context);
+    public final FluentParser<T, U> log(String name) {
+        return Parsers.log(parser, name);
     }
 }

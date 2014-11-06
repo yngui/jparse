@@ -26,12 +26,12 @@ package com.github.jparse;
 
 import static java.util.Objects.requireNonNull;
 
-public final class ThenRightParser<T, U> extends FluentParser<T, U> {
+final class ThenRightParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ?> parser1;
     private final Parser<T, ? extends U> parser2;
 
-    public ThenRightParser(Parser<T, ?> parser1, Parser<T, ? extends U> parser2) {
+    ThenRightParser(Parser<T, ?> parser1, Parser<T, ? extends U> parser2) {
         this.parser1 = requireNonNull(parser1);
         this.parser2 = requireNonNull(parser2);
     }

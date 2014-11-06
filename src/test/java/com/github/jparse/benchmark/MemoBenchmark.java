@@ -26,12 +26,10 @@ package com.github.jparse.benchmark;
 
 import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
 import com.github.jparse.FluentParser;
-import com.github.jparse.MemoParser;
 import com.github.jparse.Pair;
 import com.github.jparse.ParseResult;
 import com.github.jparse.Parser;
 import com.github.jparse.Sequence;
-import com.github.jparse.Sequences;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,6 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.jparse.CharParsers.literal;
+import static com.github.jparse.Sequences.fromCharSequence;
+import static com.github.jparse.Sequences.withMemo;
 
 public class MemoBenchmark extends AbstractBenchmark {
 
@@ -51,7 +51,7 @@ public class MemoBenchmark extends AbstractBenchmark {
     public void setUp() throws Exception {
         FluentParser<Character, String> one = literal("1");
 
-        FluentParser<Character, Object> rrOrigRef = new FluentParser<Character, Object>() {
+        Parser<Character, Object> rrOrigRef = new FluentParser<Character, Object>() {
             @Override
             public ParseResult<Character, Object> parse(Sequence<Character> sequence) {
                 return rrOrig.parse(sequence);
@@ -60,13 +60,13 @@ public class MemoBenchmark extends AbstractBenchmark {
         rrOrig = new RrOrigMemoParser<>(one.then(rrOrigRef).orelse(one),
                 new HashMap<Pair<Parser<Character, Object>, Sequence<Character>>, ParseResult<Character, Object>>());
 
-        FluentParser<Character, Object> rrModRef = new FluentParser<Character, Object>() {
+        Parser<Character, Object> rrModRef = new FluentParser<Character, Object>() {
             @Override
             public ParseResult<Character, Object> parse(Sequence<Character> sequence) {
                 return rrMod.parse(sequence);
             }
         };
-        rrMod = one.then(rrModRef).orelse(one).memo(new MemoParser.Context<Character>());
+        rrMod = one.then(rrModRef).orelse(one).memo();
 
         FluentParser<Character, Object> lrModRef = new FluentParser<Character, Object>() {
             @Override
@@ -74,13 +74,13 @@ public class MemoBenchmark extends AbstractBenchmark {
                 return lrMod.parse(sequence);
             }
         };
-        lrMod = lrModRef.then(one).orelse(one).memo(new MemoParser.Context<Character>());
+        lrMod = lrModRef.then(one).orelse(one).memo();
 
         StringBuilder sb = new StringBuilder(10000);
         for (int i = 0; i < 10000; i++) {
             sb.append('1');
         }
-        sequence = Sequences.forCharSequence(sb.toString());
+        sequence = withMemo(fromCharSequence(sb.toString()));
     }
 
     @Test

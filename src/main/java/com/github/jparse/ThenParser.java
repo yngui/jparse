@@ -27,12 +27,12 @@ package com.github.jparse;
 import static com.github.jparse.ParseResult.success;
 import static java.util.Objects.requireNonNull;
 
-public final class ThenParser<T, U, V> extends FluentParser<T, Pair<U, V>> {
+final class ThenParser<T, U, V> extends FluentParser<T, Pair<U, V>> {
 
     private final Parser<T, ? extends U> parser1;
     private final Parser<T, ? extends V> parser2;
 
-    public ThenParser(Parser<T, ? extends U> parser1, Parser<T, ? extends V> parser2) {
+    ThenParser(Parser<T, ? extends U> parser1, Parser<T, ? extends V> parser2) {
         this.parser1 = requireNonNull(parser1);
         this.parser2 = requireNonNull(parser2);
     }

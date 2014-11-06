@@ -28,24 +28,25 @@ import java.util.regex.Pattern;
 
 import static com.github.jparse.ParseResult.failure;
 import static com.github.jparse.ParseResult.success;
+import static com.github.jparse.Sequences.toCharSequence;
 import static java.util.Objects.requireNonNull;
 
-public final class LiteralParser extends CharParser<String> {
+final class LiteralParser extends CharParser<String> {
 
     private final String literal;
 
-    public LiteralParser(String literal) {
+    LiteralParser(String literal) {
         this.literal = requireNonNull(literal);
     }
 
-    public LiteralParser(String literal, Pattern whitespacePattern) {
+    LiteralParser(String literal, Pattern whitespacePattern) {
         super(whitespacePattern);
         this.literal = requireNonNull(literal);
     }
 
     @Override
     public ParseResult<Character, String> parse(Sequence<Character> sequence) {
-        CharSequence charSequence = CharSequences.forSequence(sequence);
+        CharSequence charSequence = toCharSequence(sequence);
         int start = handleWhitespace(charSequence);
         int end = start + literal.length();
         if (end > charSequence.length() || !literal.contentEquals(charSequence.subSequence(start, end))) {

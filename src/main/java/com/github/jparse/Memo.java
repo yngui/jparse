@@ -24,44 +24,24 @@
 
 package com.github.jparse;
 
-import static java.util.Objects.requireNonNull;
+import java.util.Map;
 
-public final class CharSequences {
+public class Memo<T> {
 
-    private CharSequences() {
+    @SuppressWarnings("unchecked")
+    public final <U> T get(Sequence<U> sequence) {
+        MemoSequence<U> memoSequence = (MemoSequence<U>) sequence;
+        Map<Object, Object> values = memoSequence.values;
+        if (values.containsKey(this)) {
+            return (T) values.get(this);
+        } else {
+            T value = initialValue();
+            values.put(this, value);
+            return value;
+        }
     }
 
-    public static CharSequence forSequence(Sequence<Character> sequence) {
-        if (sequence instanceof CharSequence) {
-            return (CharSequence) sequence;
-        }
-        return new SequenceAdapter(sequence);
-    }
-
-    private static final class SequenceAdapter implements CharSequence {
-
-        private final Sequence<Character> sequence;
-
-        private SequenceAdapter(Sequence<Character> sequence) {
-            this.sequence = requireNonNull(sequence);
-        }
-
-        @Override
-        public int length() {
-            return sequence.length();
-        }
-
-        @Override
-        public char charAt(int index) {
-            return sequence.at(index);
-        }
-
-        @Override
-        public CharSequence subSequence(int start, int end) {
-            if (start == 0 && end == sequence.length()) {
-                return this;
-            }
-            return new SequenceAdapter(sequence.subSequence(start, end));
-        }
+    protected T initialValue() {
+        return null;
     }
 }

@@ -27,11 +27,11 @@ package com.github.jparse;
 import static com.github.jparse.ParseResult.failure;
 import static java.util.Objects.requireNonNull;
 
-public final class PhraseParser<T, U> extends FluentParser<T, U> {
+final class PhraseParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ? extends U> parser;
 
-    public PhraseParser(Parser<T, ? extends U> parser) {
+    PhraseParser(Parser<T, ? extends U> parser) {
         this.parser = requireNonNull(parser);
     }
 

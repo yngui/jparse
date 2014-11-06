@@ -29,50 +29,44 @@ import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
-public final class LogParser<T, U> extends FluentParser<T, U> {
+final class LogParser<T, U> extends FluentParser<T, U> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogParser.class);
-    private static final Object KEY = new Object();
-    private static final String INDENT = "  ";
-
+    private static final Memo<Ident> IDENT = new Memo<Ident>() {
+        @Override
+        protected Ident initialValue() {
+            return new Ident();
+        }
+    };
     private final Parser<T, ? extends U> parser;
     private final String name;
-    private final Context context;
+    private final Logger log = LoggerFactory.getLogger(LogParser.class);
 
-    public LogParser(Parser<T, ? extends U> parser, String name, Context context) {
+    LogParser(Parser<T, ? extends U> parser, String name) {
         this.parser = requireNonNull(parser);
         this.name = requireNonNull(name);
-        this.context = requireNonNull(context);
-    }
-
-    public Context getContext() {
-        return context;
     }
 
     @Override
     public ParseResult<T, U> parse(Sequence<T> sequence) {
-        if (!LOGGER.isDebugEnabled()) {
+        if (!log.isDebugEnabled()) {
             return parser.parse(sequence).cast();
         }
-        int ident = context.ident;
-        StringBuilder sb = new StringBuilder(ident);
-        for (int i = 0; i < ident; i++) {
-            sb.append(INDENT);
+        Ident ident = IDENT.get(sequence);
+        int value = ident.value;
+        StringBuilder sb = new StringBuilder(value);
+        for (int i = 0; i < value; i++) {
+            sb.append("  ");
         }
-        LOGGER.debug("{}{} <-- {}", sb, name, sequence);
-        context.ident = ident + 1;
+        log.debug("{}{} <-- {}", sb, name, sequence);
+        ident.value = value + 1;
         ParseResult<T, U> result = parser.parse(sequence).cast();
-        context.ident--;
-        LOGGER.debug("{}{} --> {}", sb, name, result);
+        ident.value--;
+        log.debug("{}{} --> {}", sb, name, result);
         return result;
     }
 
-    public static final class Context {
+    private static final class Ident {
 
-        int ident;
-
-        public void reset() {
-            ident = 0;
-        }
+        int value;
     }
 }

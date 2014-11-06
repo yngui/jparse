@@ -27,11 +27,11 @@ package com.github.jparse;
 import static com.github.jparse.ParseResult.success;
 import static java.util.Objects.requireNonNull;
 
-public final class OptParser<T, U> extends FluentParser<T, U> {
+final class OptParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ? extends U> parser;
 
-    public OptParser(Parser<T, ? extends U> parser) {
+    OptParser(Parser<T, ? extends U> parser) {
         this.parser = requireNonNull(parser);
     }
 

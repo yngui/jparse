@@ -26,12 +26,12 @@ package com.github.jparse;
 
 import static java.util.Objects.requireNonNull;
 
-public final class OrelseParser<T, U> extends FluentParser<T, U> {
+final class OrelseParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ? extends U> parser1;
     private final Parser<T, ? extends U> parser2;
 
-    public OrelseParser(Parser<T, ? extends U> parser1, Parser<T, ? extends U> parser2) {
+    OrelseParser(Parser<T, ? extends U> parser1, Parser<T, ? extends U> parser2) {
         this.parser1 = requireNonNull(parser1);
         this.parser2 = requireNonNull(parser2);
     }

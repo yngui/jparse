@@ -24,26 +24,50 @@
 
 package com.github.jparse;
 
+import static java.util.Objects.requireNonNull;
+
 public final class Sequences {
 
     private Sequences() {
     }
 
     @SuppressWarnings("unchecked")
-    public static Sequence<Character> forCharSequence(CharSequence sequence) {
+    public static Sequence<Character> fromCharSequence(CharSequence sequence) {
         if (sequence instanceof Sequence) {
             return (Sequence<Character>) sequence;
+        } else {
+            return new SequenceAdapter(sequence);
         }
-        return new CharSequenceAdapter(sequence, 0, sequence.length());
     }
 
-    private static final class CharSequenceAdapter implements Sequence<Character>, CharSequence {
+    public static CharSequence toCharSequence(Sequence<Character> sequence) {
+        if (sequence instanceof CharSequence) {
+            return (CharSequence) sequence;
+        } else {
+            return new CharSequenceAdapter(sequence);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Sequence<T> withMemo(Sequence<T> sequence) {
+        if (sequence instanceof MemoSequence) {
+            return sequence;
+        } else {
+            return new MemoSequence<>(sequence);
+        }
+    }
+
+    private static final class SequenceAdapter implements Sequence<Character>, CharSequence {
 
         private final CharSequence sequence;
         private final int index;
         private final int length;
 
-        private CharSequenceAdapter(CharSequence sequence, int index, int length) {
+        SequenceAdapter(CharSequence sequence) {
+            this(sequence, 0, sequence.length());
+        }
+
+        private SequenceAdapter(CharSequence sequence, int index, int length) {
             this.sequence = sequence;
             this.index = index;
             this.length = length;
@@ -65,7 +89,7 @@ public final class Sequences {
         }
 
         @Override
-        public CharSequenceAdapter subSequence(int start) {
+        public SequenceAdapter subSequence(int start) {
             if (start < 0) {
                 throw new IndexOutOfBoundsException();
             }
@@ -75,11 +99,11 @@ public final class Sequences {
             if (start == 0) {
                 return this;
             }
-            return new CharSequenceAdapter(sequence, index + start, length - start);
+            return new SequenceAdapter(sequence, index + start, length - start);
         }
 
         @Override
-        public CharSequenceAdapter subSequence(int start, int end) {
+        public SequenceAdapter subSequence(int start, int end) {
             if (start < 0) {
                 throw new IndexOutOfBoundsException();
             }
@@ -92,7 +116,7 @@ public final class Sequences {
             if (start == 0 && end == length) {
                 return this;
             }
-            return new CharSequenceAdapter(sequence, index + start, end - start);
+            return new SequenceAdapter(sequence, index + start, end - start);
         }
 
         @Override
@@ -100,10 +124,10 @@ public final class Sequences {
             if (obj == this) {
                 return true;
             }
-            if (!(obj instanceof CharSequenceAdapter)) {
+            if (!(obj instanceof SequenceAdapter)) {
                 return false;
             }
-            CharSequenceAdapter other = (CharSequenceAdapter) obj;
+            SequenceAdapter other = (SequenceAdapter) obj;
             return sequence.equals(other.sequence) && index == other.index && length == other.length;
         }
 
@@ -119,6 +143,68 @@ public final class Sequences {
         @Override
         public String toString() {
             return sequence.subSequence(index, index + length).toString();
+        }
+    }
+
+    private static final class CharSequenceAdapter implements Sequence<Character>, CharSequence {
+
+        private final Sequence<Character> sequence;
+
+        CharSequenceAdapter(Sequence<Character> sequence) {
+            this.sequence = requireNonNull(sequence);
+        }
+
+        @Override
+        public int length() {
+            return sequence.length();
+        }
+
+        @Override
+        public Character at(int index) {
+            return sequence.at(index);
+        }
+
+        @Override
+        public char charAt(int index) {
+            return at(index);
+        }
+
+        @Override
+        public CharSequenceAdapter subSequence(int start) {
+            if (start == 0) {
+                return this;
+            }
+            return new CharSequenceAdapter(sequence.subSequence(start));
+        }
+
+        @Override
+        public CharSequenceAdapter subSequence(int start, int end) {
+            if (start == 0 && end == sequence.length()) {
+                return this;
+            }
+            return new CharSequenceAdapter(sequence.subSequence(start, end));
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (!(obj instanceof CharSequenceAdapter)) {
+                return false;
+            }
+            CharSequenceAdapter other = (CharSequenceAdapter) obj;
+            return sequence.equals(other.sequence);
+        }
+
+        @Override
+        public int hashCode() {
+            return sequence.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return sequence.toString();
         }
     }
 }

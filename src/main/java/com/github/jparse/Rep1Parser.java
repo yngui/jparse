@@ -31,11 +31,11 @@ import java.util.List;
 import static com.github.jparse.ParseResult.success;
 import static java.util.Objects.requireNonNull;
 
-public final class Rep1Parser<T, U> extends FluentParser<T, List<U>> {
+final class Rep1Parser<T, U> extends FluentParser<T, List<U>> {
 
     private final Parser<T, ? extends U> parser;
 
-    public Rep1Parser(Parser<T, ? extends U> parser) {
+    Rep1Parser(Parser<T, ? extends U> parser) {
         this.parser = requireNonNull(parser);
     }
 
@@ -51,9 +51,6 @@ public final class Rep1Parser<T, U> extends FluentParser<T, List<U>> {
             list.add(result.getResult());
             rest = result.getRest();
             result = parser.parse(rest);
-            if (result.isError()) {
-                return result.cast();
-            }
         } while (result.isSuccess());
         return success(Collections.unmodifiableList(list), rest);
     }

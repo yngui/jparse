@@ -28,11 +28,11 @@ import static com.github.jparse.ParseResult.failure;
 import static com.github.jparse.ParseResult.success;
 import static java.util.Objects.requireNonNull;
 
-public final class ElemParser<T> extends FluentParser<T, T> {
+final class ElemParser<T> extends FluentParser<T, T> {
 
     private final T elem;
 
-    public ElemParser(T elem) {
+    ElemParser(T elem) {
         this.elem = requireNonNull(elem);
     }
 

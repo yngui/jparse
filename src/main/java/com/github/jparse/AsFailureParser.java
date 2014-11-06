@@ -26,11 +26,11 @@ package com.github.jparse;
 
 import static java.util.Objects.requireNonNull;
 
-public final class AsFailureParser<T, U> extends FluentParser<T, U> {
+final class AsFailureParser<T, U> extends FluentParser<T, U> {
 
     private final Parser<T, ? extends U> parser;
 
-    public AsFailureParser(Parser<T, ? extends U> parser) {
+    AsFailureParser(Parser<T, ? extends U> parser) {
         this.parser = requireNonNull(parser);
     }
 

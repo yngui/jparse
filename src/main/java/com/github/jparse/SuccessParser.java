@@ -26,11 +26,11 @@ package com.github.jparse;
 
 import static com.github.jparse.ParseResult.success;
 
-public final class SuccessParser<T, U> extends FluentParser<T, U> {
+final class SuccessParser<T, U> extends FluentParser<T, U> {
 
     private final U result;
 
-    public SuccessParser(U result) {
+    SuccessParser(U result) {
         this.result = result;
     }
 
