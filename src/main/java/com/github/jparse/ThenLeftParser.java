@@ -40,13 +40,15 @@ final class ThenLeftParser<T, U> extends FluentParser<T, U> {
     @Override
     public ParseResult<T, U> parse(Sequence<T> sequence) {
         ParseResult<T, ? extends U> result1 = parser1.parse(sequence);
-        if (!result1.isSuccess()) {
+        if (result1.isSuccess()) {
+            ParseResult<T, ?> result2 = parser2.parse(result1.getRest());
+            if (result2.isSuccess()) {
+                return success(result1.getResult(), result2.getRest());
+            } else {
+                return result2.cast();
+            }
+        } else {
             return result1.cast();
         }
-        ParseResult<T, ?> result2 = parser2.parse(result1.getRest());
-        if (!result2.isSuccess()) {
-            return result2.cast();
-        }
-        return success(result1.getResult(), result2.getRest());
     }
 }

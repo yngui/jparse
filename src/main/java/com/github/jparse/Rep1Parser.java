@@ -42,16 +42,21 @@ final class Rep1Parser<T, U> extends FluentParser<T, List<U>> {
     @Override
     public ParseResult<T, List<U>> parse(Sequence<T> sequence) {
         ParseResult<T, ? extends U> result = parser.parse(sequence);
-        if (!result.isSuccess()) {
+        if (result.isSuccess()) {
+            List<U> list = new ArrayList<>();
+            Sequence<T> rest;
+            do {
+                list.add(result.getResult());
+                rest = result.getRest();
+                result = parser.parse(rest);
+            } while (result.isSuccess());
+            if (result.isError()) {
+                return result.cast();
+            } else {
+                return success(Collections.unmodifiableList(list), rest);
+            }
+        } else {
             return result.cast();
         }
-        List<U> list = new ArrayList<>();
-        Sequence<T> rest;
-        do {
-            list.add(result.getResult());
-            rest = result.getRest();
-            result = parser.parse(rest);
-        } while (result.isSuccess());
-        return success(Collections.unmodifiableList(list), rest);
     }
 }

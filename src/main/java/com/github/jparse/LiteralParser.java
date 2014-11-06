@@ -49,9 +49,10 @@ final class LiteralParser extends CharParser<String> {
         CharSequence charSequence = toCharSequence(sequence);
         int start = handleWhitespace(charSequence);
         int end = start + literal.length();
-        if (end > charSequence.length() || !literal.contentEquals(charSequence.subSequence(start, end))) {
+        if (end <= charSequence.length() && literal.contentEquals(charSequence.subSequence(start, end))) {
+            return success(literal, sequence.subSequence(end));
+        } else {
             return failure('\'' + literal + "' expected", sequence.subSequence(start));
         }
-        return success(literal, sequence.subSequence(end));
     }
 }

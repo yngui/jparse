@@ -38,9 +38,10 @@ final class ElemParser<T> extends FluentParser<T, T> {
 
     @Override
     public ParseResult<T, T> parse(Sequence<T> sequence) {
-        if (sequence.length() == 0 || !sequence.at(0).equals(elem)) {
+        if (sequence.length() != 0 && sequence.at(0).equals(elem)) {
+            return success(elem, sequence.subSequence(1));
+        } else {
             return failure('\'' + elem.toString() + "' expected", sequence);
         }
-        return success(elem, sequence.subSequence(1));
     }
 }

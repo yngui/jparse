@@ -34,13 +34,12 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
 
     private static final int DETECTED = 1;
     private static final int SKIP = 2;
-    private static final Memo<Object> SEQUENCE_ENTRIES = new Memo<Object>() {
+    private static final Memo<Object> sequenceEntries = new Memo<Object>() {
         @Override
         protected Object initialValue() {
             return new HashMap<>();
         }
     };
-
     private final Parser<T, ? extends U> parser;
 
     MemoParser(Parser<T, ? extends U> parser) {
@@ -54,18 +53,18 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
         if (sequenceEntry == null) {
             sequenceEntry = new SequenceEntry<>();
             sequenceEntries.put(sequence, sequenceEntry);
-            return setup(sequence, sequenceEntry);
         }
         ParserEntry<T, U> parserEntry = sequenceEntry.parserEntries.get(parser);
         if (parserEntry == null) {
             return setup(sequence, sequenceEntry);
+        } else {
+            return recall(sequence, sequenceEntry, parserEntry);
         }
-        return recall(sequence, sequenceEntry, parserEntry);
     }
 
     @SuppressWarnings("unchecked")
     private static <T, U> Map<Sequence<T>, SequenceEntry<T, U>> getSequenceEntries(Sequence<T> sequence) {
-        return (Map<Sequence<T>, SequenceEntry<T, U>>) SEQUENCE_ENTRIES.get(sequence);
+        return (Map<Sequence<T>, SequenceEntry<T, U>>) sequenceEntries.get(sequence);
     }
 
     private ParseResult<T, U> setup(Sequence<T> sequence, SequenceEntry<T, U> sequenceEntry) {
@@ -76,17 +75,24 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
         sequenceEntry.stack = sequenceEntry.stack.next;
         if (parserEntry.state == SKIP) {
             return result.cast();
-        }
-        if (parserEntry.state != DETECTED || !result.isSuccess()) {
-            parserEntry.result = result.cast();
-            return parserEntry.result;
-        }
-        while (true) {
-            parserEntry.result = result.cast();
-            result = parser.parse(sequence);
-            if (!result.isSuccess() || result.getRest().length() >= parserEntry.result.getRest().length()) {
-                return parserEntry.result;
+        } else if (parserEntry.state == DETECTED && result.isSuccess()) {
+            ParseResult<T, U> result2;
+            do {
+                result2 = result.cast();
+                parserEntry.result = result2;
+                result = parser.parse(sequence);
+            } while (result.isSuccess() && result.getRest().length() < result2.getRest().length());
+            if (result.isError()) {
+                result2 = result.cast();
+                parserEntry.result = result2;
+                return result2;
+            } else {
+                return result2;
             }
+        } else {
+            ParseResult<T, U> result2 = result.cast();
+            parserEntry.result = result2;
+            return result2;
         }
     }
 
@@ -94,18 +100,20 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
             ParserEntry<T, U> parserEntry) {
         if (parserEntry.state == SKIP) {
             return parser.parse(sequence).cast();
+        } else {
+            ParseResult<T, U> result = parserEntry.result;
+            if (result == null) {
+                StackEntry<T, U> stack = sequenceEntry.stack;
+                while (stack.parserEntry != parserEntry) {
+                    stack.parserEntry.state = SKIP;
+                    stack = stack.next;
+                }
+                parserEntry.state = DETECTED;
+                return failure("infinite left recursion detected", sequence);
+            } else {
+                return result;
+            }
         }
-        ParseResult<T, U> result = parserEntry.result;
-        if (result != null) {
-            return result;
-        }
-        StackEntry<T, U> stack = sequenceEntry.stack;
-        while (stack.parserEntry != parserEntry) {
-            stack.parserEntry.state = SKIP;
-            stack = stack.next;
-        }
-        parserEntry.state = DETECTED;
-        return failure("infinite left recursion detected", sequence);
     }
 
     private static final class SequenceEntry<T, U> {

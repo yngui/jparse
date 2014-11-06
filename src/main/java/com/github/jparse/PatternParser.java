@@ -50,10 +50,11 @@ final class PatternParser extends CharParser<String> {
         CharSequence charSequence = toCharSequence(sequence);
         int start = handleWhitespace(charSequence);
         Matcher matcher = pattern.matcher(charSequence.subSequence(start, charSequence.length()));
-        if (!matcher.lookingAt()) {
+        if (matcher.lookingAt()) {
+            int end = start + matcher.end();
+            return success(charSequence.subSequence(start, end).toString(), sequence.subSequence(end));
+        } else {
             return failure('\'' + pattern.toString() + "' expected", sequence.subSequence(start));
         }
-        int end = start + matcher.end();
-        return success(charSequence.subSequence(start, end).toString(), sequence.subSequence(end));
     }
 }

@@ -31,15 +31,15 @@ import static java.util.Objects.requireNonNull;
 
 final class LogParser<T, U> extends FluentParser<T, U> {
 
-    private static final Memo<Ident> IDENT = new Memo<Ident>() {
+    private static final Logger log = LoggerFactory.getLogger(LogParser.class);
+    private static final Memo<Integer> indent = new Memo<Integer>() {
         @Override
-        protected Ident initialValue() {
-            return new Ident();
+        protected Integer initialValue() {
+            return 0;
         }
     };
     private final Parser<T, ? extends U> parser;
     private final String name;
-    private final Logger log = LoggerFactory.getLogger(LogParser.class);
 
     LogParser(Parser<T, ? extends U> parser, String name) {
         this.parser = requireNonNull(parser);
@@ -48,25 +48,28 @@ final class LogParser<T, U> extends FluentParser<T, U> {
 
     @Override
     public ParseResult<T, U> parse(Sequence<T> sequence) {
-        if (!log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
+            int indent = getIndent(sequence);
+            StringBuilder sb = new StringBuilder(indent);
+            for (int i = 0; i < indent; i++) {
+                sb.append("  ");
+            }
+            log.debug("{}{} <-- {}", sb, name, sequence);
+            setIndent(sequence, indent + 1);
+            ParseResult<T, U> result = parser.parse(sequence).cast();
+            setIndent(sequence, getIndent(sequence) - 1);
+            log.debug("{}{} --> {}", sb, name, result);
+            return result;
+        } else {
             return parser.parse(sequence).cast();
         }
-        Ident ident = IDENT.get(sequence);
-        int value = ident.value;
-        StringBuilder sb = new StringBuilder(value);
-        for (int i = 0; i < value; i++) {
-            sb.append("  ");
-        }
-        log.debug("{}{} <-- {}", sb, name, sequence);
-        ident.value = value + 1;
-        ParseResult<T, U> result = parser.parse(sequence).cast();
-        ident.value--;
-        log.debug("{}{} --> {}", sb, name, result);
-        return result;
     }
 
-    private static final class Ident {
+    private static <T> Integer getIndent(Sequence<T> sequence) {
+        return indent.get(sequence);
+    }
 
-        int value;
+    private static <T> void setIndent(Sequence<T> sequence, int value) {
+        indent.set(sequence, value);
     }
 }

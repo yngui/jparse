@@ -41,6 +41,16 @@ public class Memo<T> {
         }
     }
 
+    public final <U> void set(Sequence<U> sequence, T value) {
+        MemoSequence<U> memoSequence = (MemoSequence<U>) sequence;
+        memoSequence.values.put(this, value);
+    }
+
+    public final <U> void remove(Sequence<U> sequence) {
+        MemoSequence<U> memoSequence = (MemoSequence<U>) sequence;
+        memoSequence.values.remove(this);
+    }
+
     protected T initialValue() {
         return null;
     }

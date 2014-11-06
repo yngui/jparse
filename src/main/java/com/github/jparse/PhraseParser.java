@@ -38,9 +38,10 @@ final class PhraseParser<T, U> extends FluentParser<T, U> {
     @Override
     public ParseResult<T, U> parse(Sequence<T> sequence) {
         ParseResult<T, ? extends U> result = parser.parse(sequence);
-        if (result.isSuccess() && result.getRest().length() > 0) {
+        if (!result.isSuccess() || result.getRest().length() == 0) {
+            return result.cast();
+        } else {
             return failure("end of sequence expected", result.getRest());
         }
-        return result.cast();
     }
 }
