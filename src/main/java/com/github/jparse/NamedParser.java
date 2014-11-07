@@ -24,32 +24,25 @@
 
 package com.github.jparse;
 
-import static com.github.jparse.ParseResult.success;
 import static java.util.Objects.requireNonNull;
 
-final class ThenParser<T, U, V> extends FluentParser<T, Pair<U, V>> {
+final class NamedParser<T, U> extends FluentParser<T, U> {
 
-    private final Parser<T, ? extends U> parser1;
-    private final Parser<T, ? extends V> parser2;
+    private final Parser<T, ? extends U> parser;
+    private final String name;
 
-    ThenParser(Parser<T, ? extends U> parser1, Parser<T, ? extends V> parser2) {
-        this.parser1 = requireNonNull(parser1);
-        this.parser2 = requireNonNull(parser2);
+    NamedParser(Parser<T, ? extends U> parser, String name) {
+        this.parser = requireNonNull(parser);
+        this.name = requireNonNull(name);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public ParseResult<T, Pair<U, V>> parse(Sequence<T> sequence) {
-        ParseResult<T, ? extends U> result1 = parser1.parse(sequence);
-        if (result1.isSuccess()) {
-            ParseResult<T, ? extends V> result2 = parser2.parse(result1.getRest());
-            if (result2.isSuccess()) {
-                return success(Pair.create(result1.getResult(), result2.getResult()), result2.getRest());
-            } else {
-                return (ParseResult<T, Pair<U, V>>) result2;
-            }
-        } else {
-            return (ParseResult<T, Pair<U, V>>) result1;
-        }
+    public ParseResult<T, ? extends U> parse(Sequence<T> sequence) {
+        return parser.parse(sequence);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

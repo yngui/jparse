@@ -39,6 +39,7 @@ final class RepParser<T, U> extends FluentParser<T, List<U>> {
         this.parser = requireNonNull(parser);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ParseResult<T, List<U>> parse(Sequence<T> sequence) {
         ParseResult<T, ? extends U> result = parser.parse(sequence);
@@ -51,14 +52,14 @@ final class RepParser<T, U> extends FluentParser<T, List<U>> {
                 result = parser.parse(rest);
             } while (result.isSuccess());
             if (result.isError()) {
-                return result.cast();
+                return (ParseResult<T, List<U>>) result;
             } else {
                 return success(Collections.unmodifiableList(list), rest);
             }
         } else if (result.isFailure()) {
             return success(Collections.<U>emptyList(), sequence);
         } else {
-            return result.cast();
+            return (ParseResult<T, List<U>>) result;
         }
     }
 }

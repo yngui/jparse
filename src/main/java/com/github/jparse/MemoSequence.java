@@ -24,8 +24,8 @@
 
 package com.github.jparse;
 
+import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import static java.util.Objects.requireNonNull;
 
@@ -35,7 +35,7 @@ final class MemoSequence<T> implements Sequence<T> {
     final Map<Object, Object> values;
 
     MemoSequence(Sequence<T> sequence) {
-        this(requireNonNull(sequence), new WeakHashMap<>());
+        this(requireNonNull(sequence), new IdentityHashMap<>());
     }
 
     private MemoSequence(Sequence<T> sequence, Map<Object, Object> values) {

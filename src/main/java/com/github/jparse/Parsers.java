@@ -103,7 +103,11 @@ public final class Parsers {
         return new AsErrorParser<>(parser);
     }
 
-    public static <T, U> FluentParser<T, U> log(Parser<T, U> parser, String name) {
-        return new LogParser<>(parser, name);
+    public static <T, U> FluentParser<T, U> named(Parser<T, U> parser, String name) {
+        return new NamedParser<>(parser, name);
+    }
+
+    public static <T, U> FluentParser<T, U> log(Parser<T, U> parser) {
+        return new LogParser<>(parser);
     }
 }

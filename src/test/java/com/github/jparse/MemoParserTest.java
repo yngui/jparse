@@ -24,7 +24,6 @@
 
 package com.github.jparse;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static com.github.jparse.CharParsers.literal;
@@ -35,76 +34,77 @@ import static org.junit.Assert.assertEquals;
 
 public class MemoParserTest {
 
+    private static final String SEQUENCE = "1+2+3";
+    private static final Function<Pair<String, String>, String> concat = new Function<Pair<String, String>, String>() {
+        @Override
+        public String apply(Pair<String, String> arg) {
+            return arg.getLeft() + arg.getRight();
+        }
+    };
     private static final Parser<Character, String> plus = literal("+");
     private static final Parser<Character, String> num = pattern("\\d+");
-    private static final String SEQUENCE = "1+2+3";
-    private static final Pair<Pair<Pair<Pair<String, String>, String>, String>, String> RESULT = Pair.create(
-            Pair.create(Pair.create(Pair.create("1", "+"), "2"), "+"), "3");
-    private FluentParser<Character, Object> exprRef;
-    private FluentParser<Character, Object> xRef;
-    private FluentParser<Character, Pair<Object, Object>> yRef;
-    private MemoParser<Character, Object> expr;
-    private MemoParser<Character, Object> x;
-    private MemoParser<Character, Pair<Object, Object>> y;
-    private Sequence<Character> sequence;
-
-    @Before
-    public void setUp() throws Exception {
-        exprRef = new FluentParser<Character, Object>() {
-            @Override
-            public ParseResult<Character, Object> parse(Sequence<Character> sequence) {
-                return expr.parse(sequence);
-            }
-        };
-        xRef = new FluentParser<Character, Object>() {
-            @Override
-            public ParseResult<Character, Object> parse(Sequence<Character> sequence) {
-                return x.parse(sequence);
-            }
-        };
-        yRef = new FluentParser<Character, Pair<Object, Object>>() {
-            @Override
-            public ParseResult<Character, Pair<Object, Object>> parse(Sequence<Character> sequence) {
-                return y.parse(sequence);
-            }
-        };
-        sequence = withMemo(fromCharSequence(SEQUENCE));
-    }
+    private static final Sequence<Character> sequence = fromCharSequence(SEQUENCE);
+    private final FluentParser<Character, String> exprRef = new FluentParser<Character, String>() {
+        @Override
+        public ParseResult<Character, ? extends String> parse(Sequence<Character> sequence) {
+            return expr.parse(sequence);
+        }
+    };
+    private final FluentParser<Character, String> xRef = new FluentParser<Character, String>() {
+        @Override
+        public ParseResult<Character, ? extends String> parse(Sequence<Character> sequence) {
+            return x.parse(sequence);
+        }
+    };
+    private final FluentParser<Character, String> yRef = new FluentParser<Character, String>() {
+        @Override
+        public ParseResult<Character, ? extends String> parse(Sequence<Character> sequence) {
+            return y.parse(sequence);
+        }
+    };
+    private MemoParser<Character, String> expr;
+    private MemoParser<Character, String> x;
+    private MemoParser<Character, String> y;
 
     @Test
     public void test1() {
-        expr = new MemoParser<>(exprRef.then(plus).then(num).orelse(num));
-        ParseResult<Character, Object> result = expr.phrase().parse(sequence);
-        assertEquals(RESULT, result.getResult());
+        expr = new MemoParser<>(exprRef.then(plus).map(concat).then(num).map(concat).orelse(num));
+        ParseResult<Character, ? extends String> result = expr.phrase().parse(withMemo(sequence));
+        assertEquals(SEQUENCE, result.getResult());
     }
 
     @Test
     public void test2() {
-        expr = new MemoParser<>(exprRef.then(plus).then(num).orelse(exprRef.then(plus).then(num)).orelse(num));
-        ParseResult<Character, Object> result = expr.phrase().parse(sequence);
-        assertEquals(RESULT, result.getResult());
+        expr = new MemoParser<>(exprRef.then(plus)
+                .map(concat)
+                .then(num)
+                .map(concat)
+                .orelse(exprRef.then(plus).map(concat).then(num).map(concat))
+                .orelse(num));
+        ParseResult<Character, ? extends String> result = expr.phrase().parse(withMemo(sequence));
+        assertEquals(SEQUENCE, result.getResult());
     }
 
     @Test
     public void test3() {
-        expr = new MemoParser<>(xRef.then(plus).then(num).orelse(num));
+        expr = new MemoParser<>(xRef.then(plus).map(concat).then(num).map(concat).orelse(num));
         x = new MemoParser<>(exprRef);
-        ParseResult<Character, Object> result = expr.phrase().parse(sequence);
-        assertEquals(RESULT, result.getResult());
+        ParseResult<Character, ? extends String> result = expr.phrase().parse(withMemo(sequence));
+        assertEquals(SEQUENCE, result.getResult());
     }
 
     @Test
     public void test4() {
         expr = new MemoParser<>(exprRef);
-        ParseResult<Character, Object> result = expr.phrase().parse(withMemo(fromCharSequence("dummy")));
+        ParseResult<Character, ?> result = expr.phrase().parse(withMemo(fromCharSequence("dummy")));
         assertEquals("infinite left recursion detected", result.getMessage());
     }
 
     @Test
     public void test5() {
         x = new MemoParser<>(yRef.orelse(literal("a")));
-        y = new MemoParser<>(xRef.then(xRef.orelse(yRef)));
-        ParseResult<Character, Object> result = x.phrase().parse(withMemo(fromCharSequence("a a")));
-        assertEquals(Pair.create("a", "a"), result.getResult());
+        y = new MemoParser<>(xRef.then(xRef.orelse(yRef)).map(concat));
+        ParseResult<Character, ?> result = x.phrase().parse(withMemo(fromCharSequence("aa")));
+        assertEquals("aa", result.getResult());
     }
 }

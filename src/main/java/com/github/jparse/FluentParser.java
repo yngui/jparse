@@ -46,16 +46,11 @@ public abstract class FluentParser<T, U> implements Parser<T, U> {
         } else {
             return new FluentParser<T, U>(parser) {
                 @Override
-                public ParseResult<T, U> parse(Sequence<T> sequence) {
+                public ParseResult<T, ? extends U> parse(Sequence<T> sequence) {
                     return parser.parse(sequence);
                 }
             };
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    public final <V> FluentParser<T, V> cast() {
-        return (FluentParser<T, V>) this;
     }
 
     public final <V> FluentParser<T, Pair<U, V>> then(Parser<T, V> parser) {
@@ -70,8 +65,8 @@ public abstract class FluentParser<T, U> implements Parser<T, U> {
         return Parsers.thenRight(this.parser, parser);
     }
 
-    public final FluentParser<T, Object> orelse(Parser<T, ?> parser) {
-        return Parsers.<T, Object>orelse(this.parser, parser);
+    public final FluentParser<T, U> orelse(Parser<T, ? extends U> parser) {
+        return Parsers.orelse(this.parser, parser);
     }
 
     public final FluentParser<T, U> opt() {
@@ -114,7 +109,11 @@ public abstract class FluentParser<T, U> implements Parser<T, U> {
         return Parsers.asError(parser);
     }
 
-    public final FluentParser<T, U> log(String name) {
-        return Parsers.log(parser, name);
+    public final FluentParser<T, U> named(String name) {
+        return Parsers.named(parser, name);
+    }
+
+    public final FluentParser<T, U> log() {
+        return Parsers.log(parser);
     }
 }

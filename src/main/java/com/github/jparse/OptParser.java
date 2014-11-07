@@ -36,12 +36,12 @@ final class OptParser<T, U> extends FluentParser<T, U> {
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence) {
+    public ParseResult<T, ? extends U> parse(Sequence<T> sequence) {
         ParseResult<T, ? extends U> result = parser.parse(sequence);
         if (result.isFailure()) {
             return success(null, sequence);
         } else {
-            return result.cast();
+            return result;
         }
     }
 }

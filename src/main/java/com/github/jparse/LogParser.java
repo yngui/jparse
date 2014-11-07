@@ -31,45 +31,40 @@ import static java.util.Objects.requireNonNull;
 
 final class LogParser<T, U> extends FluentParser<T, U> {
 
-    private static final Logger log = LoggerFactory.getLogger(LogParser.class);
-    private static final Memo<Integer> indent = new Memo<Integer>() {
+    private static final Memo<Integer> INDENT = new Memo<Integer>() {
         @Override
         protected Integer initialValue() {
             return 0;
         }
     };
     private final Parser<T, ? extends U> parser;
-    private final String name;
+    private final Logger log;
 
-    LogParser(Parser<T, ? extends U> parser, String name) {
+    LogParser(Parser<T, ? extends U> parser) {
+        this(parser, LoggerFactory.getLogger(LogParser.class));
+    }
+
+    LogParser(Parser<T, ? extends U> parser, Logger log) {
         this.parser = requireNonNull(parser);
-        this.name = requireNonNull(name);
+        this.log = requireNonNull(log);
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence) {
+    public ParseResult<T, ? extends U> parse(Sequence<T> sequence) {
         if (log.isDebugEnabled()) {
-            int indent = getIndent(sequence);
+            int indent = INDENT.get(sequence);
             StringBuilder sb = new StringBuilder(indent);
             for (int i = 0; i < indent; i++) {
                 sb.append("  ");
             }
-            log.debug("{}{} <-- {}", sb, name, sequence);
-            setIndent(sequence, indent + 1);
-            ParseResult<T, U> result = parser.parse(sequence).cast();
-            setIndent(sequence, getIndent(sequence) - 1);
-            log.debug("{}{} --> {}", sb, name, result);
+            log.debug("{}{} <-- {}", sb, parser, sequence);
+            INDENT.set(sequence, indent + 1);
+            ParseResult<T, ? extends U> result = parser.parse(sequence);
+            INDENT.set(sequence, INDENT.get(sequence) - 1);
+            log.debug("{}{} --> {}", sb, parser, result);
             return result;
         } else {
-            return parser.parse(sequence).cast();
+            return parser.parse(sequence);
         }
-    }
-
-    private static <T> Integer getIndent(Sequence<T> sequence) {
-        return indent.get(sequence);
-    }
-
-    private static <T> void setIndent(Sequence<T> sequence, int value) {
-        indent.set(sequence, value);
     }
 }

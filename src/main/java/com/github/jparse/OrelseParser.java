@@ -37,21 +37,21 @@ final class OrelseParser<T, U> extends FluentParser<T, U> {
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence) {
+    public ParseResult<T, ? extends U> parse(Sequence<T> sequence) {
         ParseResult<T, ? extends U> result1 = parser1.parse(sequence);
         if (result1.isFailure()) {
             ParseResult<T, ? extends U> result2 = parser2.parse(sequence);
             if (result2.isFailure()) {
                 if (result1.getRest().length() < result2.getRest().length()) {
-                    return result1.cast();
+                    return result1;
                 } else {
-                    return result2.cast();
+                    return result2;
                 }
             } else {
-                return result2.cast();
+                return result2;
             }
         } else {
-            return result1.cast();
+            return result1;
         }
     }
 }

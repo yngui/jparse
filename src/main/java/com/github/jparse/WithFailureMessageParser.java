@@ -37,7 +37,7 @@ final class WithFailureMessageParser<T, U> extends FluentParser<T, U> {
     }
 
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence) {
-        return parser.parse(sequence).withFailureMessage(message).cast();
+    public ParseResult<T, ? extends U> parse(Sequence<T> sequence) {
+        return parser.parse(sequence).withFailureMessage(message);
     }
 }

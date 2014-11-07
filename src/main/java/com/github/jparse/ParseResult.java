@@ -46,11 +46,6 @@ public abstract class ParseResult<T, U> {
         return new Error<>(message, rest);
     }
 
-    @SuppressWarnings("unchecked")
-    public final <V> ParseResult<T, V> cast() {
-        return (ParseResult<T, V>) this;
-    }
-
     public final Sequence<T> getRest() {
         return rest;
     }

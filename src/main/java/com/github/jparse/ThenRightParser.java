@@ -36,13 +36,14 @@ final class ThenRightParser<T, U> extends FluentParser<T, U> {
         this.parser2 = requireNonNull(parser2);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public ParseResult<T, U> parse(Sequence<T> sequence) {
+    public ParseResult<T, ? extends U> parse(Sequence<T> sequence) {
         ParseResult<T, ?> result1 = parser1.parse(sequence);
         if (result1.isSuccess()) {
-            return parser2.parse(result1.getRest()).cast();
+            return parser2.parse(result1.getRest());
         } else {
-            return result1.cast();
+            return (ParseResult<T, ? extends U>) result1;
         }
     }
 }
