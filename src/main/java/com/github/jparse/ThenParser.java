@@ -41,15 +41,14 @@ final class ThenParser<T, U, V> extends FluentParser<T, Pair<U, V>> {
     @Override
     public ParseResult<T, Pair<U, V>> parse(Sequence<T> sequence) {
         ParseResult<T, ? extends U> result1 = parser1.parse(sequence);
-        if (result1.isSuccess()) {
-            ParseResult<T, ? extends V> result2 = parser2.parse(result1.getRest());
-            if (result2.isSuccess()) {
-                return success(Pair.create(result1.getResult(), result2.getResult()), result2.getRest());
-            } else {
-                return (ParseResult<T, Pair<U, V>>) result2;
-            }
-        } else {
+        if (!result1.isSuccess()) {
             return (ParseResult<T, Pair<U, V>>) result1;
+        }
+        ParseResult<T, ? extends V> result2 = parser2.parse(result1.getRest());
+        if (result2.isSuccess()) {
+            return success(Pair.create(result1.getResult(), result2.getResult()), result2.getRest());
+        } else {
+            return (ParseResult<T, Pair<U, V>>) result2;
         }
     }
 }

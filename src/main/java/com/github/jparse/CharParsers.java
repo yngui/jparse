@@ -31,19 +31,27 @@ public final class CharParsers {
     private CharParsers() {
     }
 
-    public static CharParser<String> literal(String literal) {
+    public static FluentParser<Character, String> literal(String literal) {
         return new LiteralParser(literal);
     }
 
-    public static CharParser<String> literal(String literal, Pattern whitespacePattern) {
+    public static FluentParser<Character, String> literal(String literal, Pattern whitespacePattern) {
         return new LiteralParser(literal, whitespacePattern);
     }
 
-    public static CharParser<String> pattern(String pattern) {
+    public static FluentParser<Character, String> pattern(String pattern) {
         return new PatternParser(Pattern.compile(pattern));
     }
 
-    public static CharParser<String> pattern(Pattern pattern) {
+    public static FluentParser<Character, String> pattern(String pattern, Pattern whitespacePattern) {
+        return new PatternParser(Pattern.compile(pattern), whitespacePattern);
+    }
+
+    public static FluentParser<Character, String> pattern(Pattern pattern) {
         return new PatternParser(pattern);
+    }
+
+    public static FluentParser<Character, String> pattern(Pattern pattern, Pattern whitespacePattern) {
+        return new PatternParser(pattern, whitespacePattern);
     }
 }

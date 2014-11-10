@@ -81,6 +81,14 @@ public abstract class FluentParser<T, U> implements Parser<T, U> {
         return Parsers.rep1(parser);
     }
 
+    public final FluentParser<T, List<U>> repMN(int m) {
+        return Parsers.repMN(parser, m);
+    }
+
+    public final FluentParser<T, List<U>> repMN(int m, int n) {
+        return Parsers.repMN(parser, m, n);
+    }
+
     public final <V> FluentParser<T, V> map(Function<? super U, ? extends V> function) {
         return Parsers.map(parser, function);
     }

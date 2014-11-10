@@ -51,20 +51,19 @@ final class LogParser<T, U> extends FluentParser<T, U> {
 
     @Override
     public ParseResult<T, ? extends U> parse(Sequence<T> sequence) {
-        if (log.isDebugEnabled()) {
-            int indent = INDENT.get(sequence);
-            StringBuilder sb = new StringBuilder(indent);
-            for (int i = 0; i < indent; i++) {
-                sb.append("  ");
-            }
-            log.debug("{}{} <-- {}", sb, parser, sequence);
-            INDENT.set(sequence, indent + 1);
-            ParseResult<T, ? extends U> result = parser.parse(sequence);
-            INDENT.set(sequence, INDENT.get(sequence) - 1);
-            log.debug("{}{} --> {}", sb, parser, result);
-            return result;
-        } else {
+        if (!log.isDebugEnabled()) {
             return parser.parse(sequence);
         }
+        int indent = INDENT.get(sequence);
+        StringBuilder sb = new StringBuilder(indent);
+        for (int i = 0; i < indent; i++) {
+            sb.append("  ");
+        }
+        log.debug("{}{} <-- {}", sb, parser, sequence);
+        INDENT.set(sequence, indent + 1);
+        ParseResult<T, ? extends U> result = parser.parse(sequence);
+        INDENT.set(sequence, INDENT.get(sequence) - 1);
+        log.debug("{}{} --> {}", sb, parser, result);
+        return result;
     }
 }

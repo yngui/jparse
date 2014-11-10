@@ -75,6 +75,14 @@ public final class Parsers {
         return new Rep1Parser<>(parser);
     }
 
+    public static <T, U> FluentParser<T, List<U>> repMN(Parser<T, U> parser, int m) {
+        return new RepMNParser<>(parser, m);
+    }
+
+    public static <T, U> FluentParser<T, List<U>> repMN(Parser<T, U> parser, int m, int n) {
+        return new RepMNParser<>(parser, m, n);
+    }
+
     public static <T, U, V> FluentParser<T, V> map(Parser<T, U> parser, Function<? super U, ? extends V> function) {
         return new MapParser<>(parser, function);
     }

@@ -27,7 +27,7 @@ package com.github.jparse;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class CharParser<T> extends FluentParser<Character, T> {
+abstract class CharParser<T> extends FluentParser<Character, T> {
 
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
