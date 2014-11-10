@@ -50,7 +50,7 @@ final class Rep1Parser<T, U> extends FluentParser<T, List<U>> {
         list.add(result.getResult());
         Sequence<T> rest = result.getRest();
         while (true) {
-            result = parser.parse(sequence);
+            result = parser.parse(rest);
             if (result.isFailure()) {
                 return success(Collections.unmodifiableList(list), rest);
             }
