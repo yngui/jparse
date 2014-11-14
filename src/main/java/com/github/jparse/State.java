@@ -26,11 +26,11 @@ package com.github.jparse;
 
 import java.util.Map;
 
-public class Memo<T> {
+public class State<T> {
 
     @SuppressWarnings("unchecked")
     public final <U> T get(Sequence<U> sequence) {
-        Map<Object, Object> values = ((MemoSequence<U>) sequence).values;
+        Map<Object, Object> values = ((StatefulSequence<U>) sequence).values;
         if (values.containsKey(this)) {
             return (T) values.get(this);
         } else {
@@ -41,11 +41,11 @@ public class Memo<T> {
     }
 
     public final <U> void set(Sequence<U> sequence, T value) {
-        ((MemoSequence<U>) sequence).values.put(this, value);
+        ((StatefulSequence<U>) sequence).values.put(this, value);
     }
 
     public final <U> void remove(Sequence<U> sequence) {
-        ((MemoSequence<U>) sequence).values.remove(this);
+        ((StatefulSequence<U>) sequence).values.remove(this);
     }
 
     protected T initialValue() {

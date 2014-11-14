@@ -29,7 +29,7 @@ import org.junit.Test;
 import static com.github.jparse.CharParsers.literal;
 import static com.github.jparse.CharParsers.pattern;
 import static com.github.jparse.Sequences.fromCharSequence;
-import static com.github.jparse.Sequences.withMemo;
+import static com.github.jparse.StatefulSequences.withMemo;
 import static org.junit.Assert.assertEquals;
 
 public class MemoParserTest {

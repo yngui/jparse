@@ -93,10 +93,6 @@ public abstract class FluentParser<T, U> implements Parser<T, U> {
         return Parsers.map(parser, function);
     }
 
-    public final FluentParser<T, U> memo() {
-        return Parsers.memo(parser);
-    }
-
     public final FluentParser<T, U> phrase() {
         return Parsers.phrase(parser);
     }
@@ -119,9 +115,5 @@ public abstract class FluentParser<T, U> implements Parser<T, U> {
 
     public final FluentParser<T, U> named(String name) {
         return Parsers.named(parser, name);
-    }
-
-    public final FluentParser<T, U> log() {
-        return Parsers.log(parser);
     }
 }

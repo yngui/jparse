@@ -34,7 +34,7 @@ final class MemoParser<T, U> extends FluentParser<T, U> {
 
     private static final int DETECTED = 1;
     private static final int SKIP = 2;
-    private static final Memo<Map<Sequence<?>, SequenceEntry>> SEQUENCE_ENTRIES = new Memo<Map<Sequence<?>,
+    private static final State<Map<Sequence<?>, SequenceEntry>> SEQUENCE_ENTRIES = new State<Map<Sequence<?>,
             SequenceEntry>>() {
         @Override
         protected Map<Sequence<?>, SequenceEntry> initialValue() {

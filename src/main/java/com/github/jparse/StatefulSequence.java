@@ -29,16 +29,16 @@ import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
-final class MemoSequence<T> implements Sequence<T> {
+final class StatefulSequence<T> implements Sequence<T> {
 
     private final Sequence<T> sequence;
     final Map<Object, Object> values;
 
-    MemoSequence(Sequence<T> sequence) {
+    StatefulSequence(Sequence<T> sequence) {
         this(requireNonNull(sequence), new IdentityHashMap<>());
     }
 
-    private MemoSequence(Sequence<T> sequence, Map<Object, Object> values) {
+    private StatefulSequence(Sequence<T> sequence, Map<Object, Object> values) {
         this.sequence = sequence;
         this.values = values;
     }
@@ -54,19 +54,19 @@ final class MemoSequence<T> implements Sequence<T> {
     }
 
     @Override
-    public MemoSequence<T> subSequence(int start) {
+    public StatefulSequence<T> subSequence(int start) {
         if (start == 0) {
             return this;
         }
-        return new MemoSequence<>(sequence.subSequence(start), values);
+        return new StatefulSequence<>(sequence.subSequence(start), values);
     }
 
     @Override
-    public MemoSequence<T> subSequence(int start, int end) {
+    public StatefulSequence<T> subSequence(int start, int end) {
         if (start == 0 && end == sequence.length()) {
             return this;
         }
-        return new MemoSequence<>(sequence.subSequence(start, end), values);
+        return new StatefulSequence<>(sequence.subSequence(start, end), values);
     }
 
     @Override
@@ -74,11 +74,11 @@ final class MemoSequence<T> implements Sequence<T> {
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof MemoSequence)) {
+        if (!(obj instanceof StatefulSequence)) {
             return false;
         }
         @SuppressWarnings("unchecked")
-        MemoSequence<T> other = (MemoSequence<T>) obj;
+        StatefulSequence<T> other = (StatefulSequence<T>) obj;
         return sequence.equals(other.sequence);
     }
 

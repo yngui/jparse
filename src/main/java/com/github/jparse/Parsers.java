@@ -87,10 +87,6 @@ public final class Parsers {
         return new MapParser<>(parser, function);
     }
 
-    public static <T, U> FluentParser<T, U> memo(Parser<T, U> parser) {
-        return new MemoParser<>(parser);
-    }
-
     public static <T, U> FluentParser<T, U> phrase(Parser<T, U> parser) {
         return new PhraseParser<>(parser);
     }
@@ -113,9 +109,5 @@ public final class Parsers {
 
     public static <T, U> FluentParser<T, U> named(Parser<T, U> parser, String name) {
         return new NamedParser<>(parser, name);
-    }
-
-    public static <T, U> FluentParser<T, U> log(Parser<T, U> parser) {
-        return new LogParser<>(parser);
     }
 }

@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
 
 final class LogParser<T, U> extends FluentParser<T, U> {
 
-    private static final Memo<Integer> INDENT = new Memo<Integer>() {
+    private static final State<Integer> INDENT = new State<Integer>() {
         @Override
         protected Integer initialValue() {
             return 0;

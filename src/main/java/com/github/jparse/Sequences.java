@@ -48,15 +48,6 @@ public final class Sequences {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> Sequence<T> withMemo(Sequence<T> sequence) {
-        if (sequence instanceof MemoSequence) {
-            return sequence;
-        } else {
-            return new MemoSequence<>(sequence);
-        }
-    }
-
     private static final class SequenceAdapter implements Sequence<Character>, CharSequence {
 
         private final CharSequence sequence;
