@@ -32,15 +32,15 @@ import static java.util.Objects.requireNonNull;
 final class StatefulSequence<T> implements Sequence<T> {
 
     private final Sequence<T> sequence;
-    final Map<Object, Object> values;
+    final Map<Object, Object> states;
 
     StatefulSequence(Sequence<T> sequence) {
         this(requireNonNull(sequence), new IdentityHashMap<>());
     }
 
-    private StatefulSequence(Sequence<T> sequence, Map<Object, Object> values) {
+    private StatefulSequence(Sequence<T> sequence, Map<Object, Object> states) {
         this.sequence = sequence;
-        this.values = values;
+        this.states = states;
     }
 
     @Override
@@ -58,7 +58,7 @@ final class StatefulSequence<T> implements Sequence<T> {
         if (start == 0) {
             return this;
         }
-        return new StatefulSequence<>(sequence.subSequence(start), values);
+        return new StatefulSequence<>(sequence.subSequence(start), states);
     }
 
     @Override
@@ -66,7 +66,7 @@ final class StatefulSequence<T> implements Sequence<T> {
         if (start == 0 && end == sequence.length()) {
             return this;
         }
-        return new StatefulSequence<>(sequence.subSequence(start, end), values);
+        return new StatefulSequence<>(sequence.subSequence(start, end), states);
     }
 
     @Override

@@ -30,22 +30,22 @@ public class State<T> {
 
     @SuppressWarnings("unchecked")
     public final <U> T get(Sequence<U> sequence) {
-        Map<Object, Object> values = ((StatefulSequence<U>) sequence).values;
-        if (values.containsKey(this)) {
-            return (T) values.get(this);
+        Map<Object, Object> states = ((StatefulSequence<U>) sequence).states;
+        if (states.containsKey(this)) {
+            return (T) states.get(this);
         } else {
             T value = initialValue();
-            values.put(this, value);
+            states.put(this, value);
             return value;
         }
     }
 
     public final <U> void set(Sequence<U> sequence, T value) {
-        ((StatefulSequence<U>) sequence).values.put(this, value);
+        ((StatefulSequence<U>) sequence).states.put(this, value);
     }
 
     public final <U> void remove(Sequence<U> sequence) {
-        ((StatefulSequence<U>) sequence).values.remove(this);
+        ((StatefulSequence<U>) sequence).states.remove(this);
     }
 
     protected T initialValue() {
