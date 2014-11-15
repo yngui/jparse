@@ -30,7 +30,7 @@ public final class StatefulSequences {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Sequence<T> withMemo(Sequence<T> sequence) {
+    public static <T> Sequence<T> stateful(Sequence<T> sequence) {
         if (sequence instanceof StatefulSequence) {
             return sequence;
         } else {

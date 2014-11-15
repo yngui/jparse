@@ -29,7 +29,7 @@ import org.junit.Test;
 import static com.github.jparse.CharParsers.literal;
 import static com.github.jparse.CharParsers.pattern;
 import static com.github.jparse.Sequences.fromCharSequence;
-import static com.github.jparse.StatefulSequences.withMemo;
+import static com.github.jparse.StatefulSequences.stateful;
 import static org.junit.Assert.assertEquals;
 
 public class MemoParserTest {
@@ -69,7 +69,7 @@ public class MemoParserTest {
     @Test
     public void test1() {
         expr = new MemoParser<>(exprRef.then(plus).map(concat).then(num).map(concat).orelse(num));
-        ParseResult<Character, ? extends String> result = expr.phrase().parse(withMemo(sequence));
+        ParseResult<Character, ? extends String> result = expr.phrase().parse(stateful(sequence));
         assertEquals(SEQUENCE, result.getResult());
     }
 
@@ -81,7 +81,7 @@ public class MemoParserTest {
                 .map(concat)
                 .orelse(exprRef.then(plus).map(concat).then(num).map(concat))
                 .orelse(num));
-        ParseResult<Character, ? extends String> result = expr.phrase().parse(withMemo(sequence));
+        ParseResult<Character, ? extends String> result = expr.phrase().parse(stateful(sequence));
         assertEquals(SEQUENCE, result.getResult());
     }
 
@@ -89,14 +89,14 @@ public class MemoParserTest {
     public void test3() {
         expr = new MemoParser<>(xRef.then(plus).map(concat).then(num).map(concat).orelse(num));
         x = new MemoParser<>(exprRef);
-        ParseResult<Character, ? extends String> result = expr.phrase().parse(withMemo(sequence));
+        ParseResult<Character, ? extends String> result = expr.phrase().parse(stateful(sequence));
         assertEquals(SEQUENCE, result.getResult());
     }
 
     @Test
     public void test4() {
         expr = new MemoParser<>(exprRef);
-        ParseResult<Character, ?> result = expr.phrase().parse(withMemo(fromCharSequence("dummy")));
+        ParseResult<Character, ?> result = expr.phrase().parse(stateful(fromCharSequence("dummy")));
         assertEquals("infinite left recursion detected", result.getMessage());
     }
 
@@ -104,7 +104,7 @@ public class MemoParserTest {
     public void test5() {
         x = new MemoParser<>(yRef.orelse(literal("a")));
         y = new MemoParser<>(xRef.then(xRef.orelse(yRef)).map(concat));
-        ParseResult<Character, ?> result = x.phrase().parse(withMemo(fromCharSequence("aa")));
+        ParseResult<Character, ?> result = x.phrase().parse(stateful(fromCharSequence("aa")));
         assertEquals("aa", result.getResult());
     }
 }
